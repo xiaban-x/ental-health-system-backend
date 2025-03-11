@@ -8,9 +8,9 @@ server:
 
 spring:
     datasource:
-        driverClassName: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/t017?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
-        username: root
+        driverClassName: org.postgresql.Driver
+        url: jdbc:postgresql://127.0.0.1:5432/ental_health_system_backend
+        username: postgres
         password: 123456
     servlet:
       multipart:
@@ -43,4 +43,4 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     #springboot 项目mybatis plus 设置 jdbcTypeForNull (oracle数据库需配置JdbcType.NULL, 默认是Other)
-    jdbc-type-for-null: 'null' 
+    jdbc-type-for-null: 'null'
