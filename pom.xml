@@ -113,6 +113,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!-- SpringDoc OpenAPI UI -->
+		<!-- 移除 springdoc 依赖，添加 swagger2 依赖 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+		<!-- 其他现有依赖 -->
 	</dependencies>
 
 	<build>
@@ -123,5 +138,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

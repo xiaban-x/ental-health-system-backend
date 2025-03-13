@@ -4,35 +4,42 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.interceptor.AuthorizationInterceptor;
 
 @Configuration
-public class InterceptorConfig extends WebMvcConfigurationSupport{
-	
-	@Bean
+public class InterceptorConfig implements WebMvcConfigurer {
+
+    @Bean
     public AuthorizationInterceptor getAuthorizationInterceptor() {
         return new AuthorizationInterceptor();
     }
-	
-	@Override
+
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(getAuthorizationInterceptor()).addPathPatterns("/**").excludePathPatterns("/static/**");
-        super.addInterceptors(registry);
-	}
-	
-	/**
-	 * springboot 2.0配置WebMvcConfigurationSupport之后，会导致默认配置被覆盖，要访问静态资源需要重写addResourceHandlers方法
-	 */
-	@Override
+        registry.addInterceptor(getAuthorizationInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/static/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/swagger-ui/**",
+                        "/v2/api-docs",
+                        "/webjars/**",
+                        "/error"
+                );
+    }
+
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/**")
-        .addResourceLocations("classpath:/resources/")
-        .addResourceLocations("classpath:/static/")
-        .addResourceLocations("classpath:/admin/")
-        .addResourceLocations("classpath:/front/")
-        .addResourceLocations("classpath:/public/");
-		super.addResourceHandlers(registry);
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+                
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
     }
 }
