@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.annotation.IgnoreAuth;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.entity.ConfigEntity;
 import com.entity.EIException;
 import com.service.ConfigService;
@@ -38,44 +38,45 @@ import com.utils.R;
  */
 @RestController
 @RequestMapping("file")
-@SuppressWarnings({"unchecked","rawtypes"})
-public class FileController{
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class FileController {
 	@Autowired
-    private ConfigService configService;
+	private ConfigService configService;
+
 	/**
 	 * 上传文件
 	 */
 	@RequestMapping("/upload")
-	public R upload(@RequestParam("file") MultipartFile file,String type) throws Exception {
+	public R upload(@RequestParam("file") MultipartFile file, String type) throws Exception {
 		if (file.isEmpty()) {
 			throw new EIException("上传文件不能为空");
 		}
-		String fileExt = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1);
+		String fileExt = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
 		File path = new File(ResourceUtils.getURL("classpath:static").getPath());
-		if(!path.exists()) {
-		    path = new File("");
+		if (!path.exists()) {
+			path = new File("");
 		}
-		File upload = new File(path.getAbsolutePath(),"/upload/");
-		if(!upload.exists()) {
-		    upload.mkdirs();
+		File upload = new File(path.getAbsolutePath(), "/upload/");
+		if (!upload.exists()) {
+			upload.mkdirs();
 		}
-		String fileName = new Date().getTime()+"."+fileExt;
-		File dest = new File(upload.getAbsolutePath()+"/"+fileName);
+		String fileName = new Date().getTime() + "." + fileExt;
+		File dest = new File(upload.getAbsolutePath() + "/" + fileName);
 		file.transferTo(dest);
-		if(StringUtils.isNotBlank(type) && type.equals("1")) {
-			ConfigEntity configEntity = configService.selectOne(new EntityWrapper<ConfigEntity>().eq("name", "faceFile"));
-			if(configEntity==null) {
+		if (StringUtils.isNotBlank(type) && type.equals("1")) {
+			ConfigEntity configEntity = configService.getOne(new QueryWrapper<ConfigEntity>().eq("name", "faceFile"));
+			if (configEntity == null) {
 				configEntity = new ConfigEntity();
 				configEntity.setName("faceFile");
 				configEntity.setValue(fileName);
 			} else {
 				configEntity.setValue(fileName);
 			}
-			configService.insertOrUpdate(configEntity);
+			configService.saveOrUpdate(configEntity);
 		}
 		return R.ok().put("file", fileName);
 	}
-	
+
 	/**
 	 * 下载文件
 	 */
@@ -84,27 +85,29 @@ public class FileController{
 	public ResponseEntity<byte[]> download(@RequestParam String fileName) {
 		try {
 			File path = new File(ResourceUtils.getURL("classpath:static").getPath());
-			if(!path.exists()) {
-			    path = new File("");
+			if (!path.exists()) {
+				path = new File("");
 			}
-			File upload = new File(path.getAbsolutePath(),"/upload/");
-			if(!upload.exists()) {
-			    upload.mkdirs();
+			File upload = new File(path.getAbsolutePath(), "/upload/");
+			if (!upload.exists()) {
+				upload.mkdirs();
 			}
-			File file = new File(upload.getAbsolutePath()+"/"+fileName);
-			if(file.exists()){
-				/*if(!fileService.canRead(file, SessionManager.getSessionUser())){
-					getResponse().sendError(403);
-				}*/
+			File file = new File(upload.getAbsolutePath() + "/" + fileName);
+			if (file.exists()) {
+				/*
+				 * if(!fileService.canRead(file, SessionManager.getSessionUser())){
+				 * getResponse().sendError(403);
+				 * }
+				 */
 				HttpHeaders headers = new HttpHeaders();
-			    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);    
-			    headers.setContentDispositionFormData("attachment", fileName);    
-			    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),headers, HttpStatus.CREATED);
+				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+				headers.setContentDispositionFormData("attachment", fileName);
+				return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<byte[]>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 }

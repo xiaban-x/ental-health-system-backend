@@ -3,50 +3,48 @@ package com.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.*;
 
-/** 
+/**
  * token表
  */
 @TableName("token")
 public class TokenEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@TableId(type = IdType.AUTO)
 	private Long id;
-	
+
 	/**
 	 * 用户id
 	 */
 	private Long userid;
-	
+
 	/**
 	 * 用户名
 	 */
 	private String username;
-	
+
 	/**
 	 * 表名
 	 */
 	private String tablename;
-	
+
 	/**
 	 * 角色
 	 */
 	private String role;
-	
+
 	/**
 	 * token
 	 */
 	private String token;
-	
+
 	/**
 	 * 过期时间
 	 */
 	private Date expiratedtime;
-	
+
 	/**
 	 * 新增时间
 	 */
@@ -116,7 +114,7 @@ public class TokenEntity implements Serializable {
 		this.username = username;
 	}
 
-	public TokenEntity(Long userid, String username, String tablename,String role, String token, Date expiratedtime) {
+	public TokenEntity(Long userid, String username, String tablename, String role, String token, Date expiratedtime) {
 		super();
 		this.userid = userid;
 		this.username = username;
@@ -125,8 +123,8 @@ public class TokenEntity implements Serializable {
 		this.token = token;
 		this.expiratedtime = expiratedtime;
 	}
-	
+
 	public TokenEntity() {
 	}
-	
+
 }

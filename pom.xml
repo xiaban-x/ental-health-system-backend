@@ -18,82 +18,87 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<fastjson.version>1.2.8</fastjson.version>
-		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+		<spring-boot.version>2.7.18</spring-boot.version>
+		<fastjson.version>1.2.83</fastjson.version>
+		<mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+		<shiro.version>1.12.0</shiro.version>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<commons-io.version>2.11.0</commons-io.version>
+		<hutool.version>5.8.23</hutool.version>
+		<springdoc.version>1.7.0</springdoc.version>
 	</properties>
 
 	<dependencies>
+		<!-- Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<!-- MyBatis-Plus -->
 		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>2.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>${mybatis-plus.version}</version>
 		</dependency>
 
+		<!-- PostgreSQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- Shiro -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-spring</artifactId>
-			<version>1.3.2</version>
+			<version>${shiro.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.baomidou</groupId>
-			<artifactId>mybatis-plus</artifactId>
-			<version>2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.baomidou</groupId>
-			<artifactId>mybatisplus-spring-boot-starter</artifactId>
-			<version>1.0.5</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.protobuf</groupId>
-			<artifactId>protobuf-java</artifactId>
-			<version>3.10.0</version>
-		</dependency>
-
+		<!-- 工具库 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.0</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>2.0.1.Final</version>
-		</dependency>
-
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.5</version>
+			<version>${commons-io.version}</version>
 		</dependency>
-
-
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
-			<version>4.0.12</version>
+			<version>${hutool.version}</version>
 		</dependency>
 
-		<!-- FastJson -->
+		<!-- FastJSON -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>${fastjson.version}</version>
+		</dependency>
+
+		<!-- Swagger (springdoc-openapi) 适用于 Spring Boot 2.7 -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
+
+		<!-- 测试 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.30</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- 百度人工智能 -->
 		<dependency>
@@ -101,33 +106,6 @@
 			<artifactId>java-sdk</artifactId>
 			<version>4.4.1</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- SpringDoc OpenAPI UI -->
-		<!-- 移除 springdoc 依赖，添加 swagger2 依赖 -->
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-
-		<!-- 其他现有依赖 -->
 	</dependencies>
 
 	<build>
@@ -138,4 +116,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

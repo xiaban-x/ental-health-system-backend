@@ -4,13 +4,11 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.List;
 
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.utils.PageUtils;
-import com.utils.Query;
-
 
 import com.dao.ExamquestionDao;
 import com.entity.ExamquestionEntity;
@@ -20,43 +18,43 @@ import com.entity.view.ExamquestionView;
 
 @Service("examquestionService")
 public class ExamquestionServiceImpl extends ServiceImpl<ExamquestionDao, ExamquestionEntity> implements ExamquestionService {
-	
-	
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        Page<ExamquestionEntity> page = this.selectPage(
-                new Query<ExamquestionEntity>(params).getPage(),
-                new EntityWrapper<ExamquestionEntity>()
-        );
+        IPage<ExamquestionEntity> page = this.page(
+                new Page<ExamquestionEntity>(
+                        params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                        params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10),
+                new QueryWrapper<ExamquestionEntity>());
+        return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+    }
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamquestionEntity> wrapper) {
+        Page<ExamquestionView> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        page.setRecords(baseMapper.selectListView((Page<ExamquestionView>) page, wrapper));
         return new PageUtils(page);
     }
-    
-    @Override
-	public PageUtils queryPage(Map<String, Object> params, Wrapper<ExamquestionEntity> wrapper) {
-		  Page<ExamquestionView> page =new Query<ExamquestionView>(params).getPage();
-	        page.setRecords(baseMapper.selectListView(page,wrapper));
-	    	PageUtils pageUtil = new PageUtils(page);
-	    	return pageUtil;
- 	}
-    
-    @Override
-	public List<ExamquestionVO> selectListVO(Wrapper<ExamquestionEntity> wrapper) {
- 		return baseMapper.selectListVO(wrapper);
-	}
-	
-	@Override
-	public ExamquestionVO selectVO(Wrapper<ExamquestionEntity> wrapper) {
- 		return baseMapper.selectVO(wrapper);
-	}
-	
-	@Override
-	public List<ExamquestionView> selectListView(Wrapper<ExamquestionEntity> wrapper) {
-		return baseMapper.selectListView(wrapper);
-	}
 
-	@Override
-	public ExamquestionView selectView(Wrapper<ExamquestionEntity> wrapper) {
-		return baseMapper.selectView(wrapper);
-	}
+    @Override
+    public List<ExamquestionVO> selectListVO(QueryWrapper<ExamquestionEntity> wrapper) {
+        return baseMapper.selectListVO(wrapper);
+    }
 
+    @Override
+    public ExamquestionVO selectVO(QueryWrapper<ExamquestionEntity> wrapper) {
+        return baseMapper.selectVO(wrapper);
+    }
+
+    @Override
+    public List<ExamquestionView> selectListView(QueryWrapper<ExamquestionEntity> wrapper) {
+        return baseMapper.selectListView(wrapper);
+    }
+
+    @Override
+    public ExamquestionView selectView(QueryWrapper<ExamquestionEntity> wrapper) {
+        return baseMapper.selectView(wrapper);
+    }
 }

@@ -1,24 +1,24 @@
-
 package com.config;
 
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.baomidou.mybatisplus.mapper.MetaObjectHandler;
-import com.baomidou.mybatisplus.plugins.PaginationInterceptor;
-
 /**
- * mybatis-plus配置
+ * MyBatis-Plus 配置类
  */
 @Configuration
 public class MybatisPlusConfig {
 
     /**
-     * 分页插件
+     * MyBatis-Plus 插件
      */
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor();
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 添加分页插件
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        return interceptor;
     }
-    
 }

@@ -2,35 +2,35 @@ package com.entity.view;
 
 import com.entity.YonghuEntity;
 
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
 import java.lang.reflect.InvocationTargetException;
 
 import java.io.Serializable;
- 
 
 /**
  * 用户
- * 后端返回视图实体辅助类   
+ * 后端返回视图实体辅助类
  * （通常后端关联的表或者自定义的字段需要返回使用）
- * @author 
- * @email 
+ * 
+ * @author
+ * @email
  * @date 2021-05-04 17:24:35
  */
 @TableName("yonghu")
-public class YonghuView  extends YonghuEntity implements Serializable {
+public class YonghuView extends YonghuEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public YonghuView(){
+	public YonghuView() {
 	}
- 
- 	public YonghuView(YonghuEntity yonghuEntity){
- 	try {
+
+	public YonghuView(YonghuEntity yonghuEntity) {
+		try {
 			BeanUtils.copyProperties(this, yonghuEntity);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 		
+
 	}
 }

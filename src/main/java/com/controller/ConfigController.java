@@ -1,111 +1,121 @@
-
 package com.controller;
-
 
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.annotation.IgnoreAuth;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.entity.ConfigEntity;
 import com.service.ConfigService;
 import com.utils.PageUtils;
 import com.utils.R;
-import com.utils.ValidatorUtils;
 
 /**
- * 登录相关
+ * 配置管理接口
  */
-@RequestMapping("config")
 @RestController
-public class ConfigController{
-	
-	@Autowired
-	private ConfigService configService;
+@RequestMapping("/config")
+public class ConfigController {
 
-	/**
-     * 列表
+    @Autowired
+    private ConfigService configService;
+
+    /**
+     * 分页查询
      */
-    @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params,ConfigEntity config){
-        EntityWrapper<ConfigEntity> ew = new EntityWrapper<ConfigEntity>();
-    	PageUtils page = configService.queryPage(params);
-        return R.ok().put("data", page);
-    }
-    
-	/**
-     * 列表
-     */
-    @IgnoreAuth
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params,ConfigEntity config){
-        EntityWrapper<ConfigEntity> ew = new EntityWrapper<ConfigEntity>();
-    	PageUtils page = configService.queryPage(params);
+    @GetMapping("/page")
+    public R page(@RequestParam Map<String, Object> params, ConfigEntity config) {
+        PageUtils page = configService.queryPage(params);
         return R.ok().put("data", page);
     }
 
     /**
-     * 信息
-     */
-    @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") String id){
-        ConfigEntity config = configService.selectById(id);
-        return R.ok().put("data", config);
-    }
-    
-    /**
-     * 详情
+     * 获取列表
      */
     @IgnoreAuth
-    @RequestMapping("/detail/{id}")
-    public R detail(@PathVariable("id") String id){
-        ConfigEntity config = configService.selectById(id);
-        return R.ok().put("data", config);
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params, ConfigEntity config) {
+        PageUtils page = configService.queryPage(params);
+        return R.ok().put("data", page);
     }
-    
+
     /**
-     * 根据name获取信息
+     * 获取配置信息
      */
-    @RequestMapping("/info")
-    public R infoByName(@RequestParam String name){
-        ConfigEntity config = configService.selectOne(new EntityWrapper<ConfigEntity>().eq("name", "faceFile"));
+    @GetMapping("/info/{id}")
+    public R info(@PathVariable("id") String id) {
+        ConfigEntity config = configService.getById(id);
+        if (config == null) {
+            return R.error("未找到对应的配置");
+        }
         return R.ok().put("data", config);
     }
-    
+
     /**
-     * 保存
+     * 获取配置详情
+     */
+    @IgnoreAuth
+    @GetMapping("/detail/{id}")
+    public R detail(@PathVariable("id") String id) {
+        ConfigEntity config = configService.getById(id);
+        if (config == null) {
+            return R.error("未找到对应的配置详情");
+        }
+        return R.ok().put("data", config);
+    }
+
+    /**
+     * 根据 name 获取配置信息
+     */
+    @GetMapping("/info")
+    public R infoByName(@RequestParam String name) {
+        if (StringUtils.isBlank(name)) {
+            return R.error("参数 name 不能为空");
+        }
+        ConfigEntity config = configService.getOne(new QueryWrapper<ConfigEntity>().eq("name", name), false);
+        if (config == null) {
+            return R.error("未找到 name 对应的配置");
+        }
+        return R.ok().put("data", config);
+    }
+
+    /**
+     * 新增配置
      */
     @PostMapping("/save")
-    public R save(@RequestBody ConfigEntity config){
-//    	ValidatorUtils.validateEntity(config);
-    	configService.insert(config);
-        return R.ok();
+    public R save(@RequestBody ConfigEntity config) {
+        if (config == null || StringUtils.isBlank(config.getName())) {
+            return R.error("配置名称不能为空");
+        }
+        boolean saved = configService.save(config);
+        return saved ? R.ok() : R.error("保存失败");
     }
 
     /**
-     * 修改
+     * 修改配置
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody ConfigEntity config){
-//        ValidatorUtils.validateEntity(config);
-        configService.updateById(config);//全部更新
-        return R.ok();
+    @PutMapping("/update")
+    public R update(@RequestBody ConfigEntity config) {
+        if (config == null || config.getId() == null) {
+            return R.error("ID 不能为空");
+        }
+        boolean updated = configService.updateById(config);
+        return updated ? R.ok() : R.error("更新失败");
     }
 
     /**
-     * 删除
+     * 删除配置
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-    	configService.deleteBatchIds(Arrays.asList(ids));
-        return R.ok();
+    @DeleteMapping("/delete")
+    public R delete(@RequestBody Long[] ids) {
+        if (ids == null || ids.length == 0) {
+            return R.error("删除 ID 不能为空");
+        }
+        boolean removed = configService.removeByIds(Arrays.asList(ids));
+        return removed ? R.ok() : R.error("删除失败");
     }
 }
