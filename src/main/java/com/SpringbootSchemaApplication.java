@@ -2,12 +2,12 @@ package com;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
-@EnableWebMvc
+@MapperScan("com.dao")
 public class SpringbootSchemaApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(SpringbootSchemaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SpringbootSchemaApplication.class, args);
+    }
 }
