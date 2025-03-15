@@ -33,9 +33,22 @@ import com.entity.EIException;
 import com.service.ConfigService;
 import com.utils.R;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 /**
- * 上传文件映射表
+ * 文件上传下载接口
+ * 
+ * @author Trae
+ * @version 1.0
  */
+@Tag(name = "文件管理", description = "文件上传下载相关接口")
 @RestController
 @RequestMapping("file")
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -44,8 +57,17 @@ public class FileController {
 	private ConfigService configService;
 
 	/**
-	 * 上传文件
+	 * 文件上传接口
 	 */
+	@Operation(summary = "文件上传", description = "上传文件并返回文件名，支持人脸识别文件的特殊处理")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "上传成功"),
+			@ApiResponse(responseCode = "500", description = "上传失败")
+	})
+	@Parameters({
+			@Parameter(name = "file", description = "要上传的文件", required = true),
+			@Parameter(name = "type", description = "文件类型(1:人脸识别文件)")
+	})
 	@RequestMapping("/upload")
 	public R upload(@RequestParam("file") MultipartFile file, String type) throws Exception {
 		if (file.isEmpty()) {
@@ -78,8 +100,14 @@ public class FileController {
 	}
 
 	/**
-	 * 下载文件
+	 * 文件下载接口
 	 */
+	@Operation(summary = "文件下载", description = "根据文件名下载指定文件")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "下载成功"),
+			@ApiResponse(responseCode = "500", description = "下载失败或文件不存在")
+	})
+	@Parameter(name = "fileName", description = "要下载的文件名", required = true)
 	@IgnoreAuth
 	@RequestMapping("/download")
 	public ResponseEntity<byte[]> download(@RequestParam String fileName) {

@@ -13,29 +13,40 @@ import com.entity.ConfigEntity;
 import com.service.ConfigService;
 import com.utils.PageUtils;
 import com.utils.R;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * 配置管理接口
+ * 
+ * @author Trae
+ * @version 1.0
  */
 @RestController
 @RequestMapping("/config")
+@Tag(name = "配置管理", description = "系统配置管理相关接口")
 public class ConfigController {
-
     @Autowired
     private ConfigService configService;
 
-    /**
-     * 分页查询
-     */
+    @Operation(summary = "分页查询配置", description = "获取配置信息的分页列表")
+    @Parameters({
+            @Parameter(name = "params", description = "分页参数", required = true),
+            @Parameter(name = "config", description = "配置查询条件")
+    })
     @GetMapping("/page")
     public R page(@RequestParam Map<String, Object> params, ConfigEntity config) {
         PageUtils page = configService.queryPage(params);
         return R.ok().put("data", page);
     }
 
-    /**
-     * 获取列表
-     */
+    @Operation(summary = "获取配置列表", description = "获取所有配置信息")
+    @Parameters({
+            @Parameter(name = "params", description = "查询参数"),
+            @Parameter(name = "config", description = "配置查询条件")
+    })
     @IgnoreAuth
     @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params, ConfigEntity config) {
@@ -46,6 +57,8 @@ public class ConfigController {
     /**
      * 获取配置信息
      */
+    @Operation(summary = "获取配置信息", description = "根据ID获取单个配置的详细信息")
+    @Parameter(name = "id", description = "配置ID", required = true)
     @GetMapping("/info/{id}")
     public R info(@PathVariable("id") String id) {
         ConfigEntity config = configService.getById(id);
@@ -58,6 +71,8 @@ public class ConfigController {
     /**
      * 获取配置详情
      */
+    @Operation(summary = "获取配置详情", description = "根据ID获取配置详情，无需认证")
+    @Parameter(name = "id", description = "配置ID", required = true)
     @IgnoreAuth
     @GetMapping("/detail/{id}")
     public R detail(@PathVariable("id") String id) {
@@ -71,6 +86,8 @@ public class ConfigController {
     /**
      * 根据 name 获取配置信息
      */
+    @Operation(summary = "根据名称获取配置", description = "根据配置名称获取配置信息")
+    @Parameter(name = "name", description = "配置名称", required = true)
     @GetMapping("/info")
     public R infoByName(@RequestParam String name) {
         if (StringUtils.isBlank(name)) {
@@ -86,6 +103,8 @@ public class ConfigController {
     /**
      * 新增配置
      */
+    @Operation(summary = "新增配置", description = "创建新的配置项")
+    @Parameter(name = "config", description = "配置信息", required = true)
     @PostMapping("/save")
     public R save(@RequestBody ConfigEntity config) {
         if (config == null || StringUtils.isBlank(config.getName())) {
@@ -98,6 +117,8 @@ public class ConfigController {
     /**
      * 修改配置
      */
+    @Operation(summary = "修改配置", description = "更新已有的配置信息")
+    @Parameter(name = "config", description = "配置信息", required = true)
     @PutMapping("/update")
     public R update(@RequestBody ConfigEntity config) {
         if (config == null || config.getId() == null) {
@@ -110,6 +131,8 @@ public class ConfigController {
     /**
      * 删除配置
      */
+    @Operation(summary = "删除配置", description = "批量删除配置信息")
+    @Parameter(name = "ids", description = "配置ID数组", required = true)
     @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
         if (ids == null || ids.length == 0) {

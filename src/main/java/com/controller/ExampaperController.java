@@ -15,20 +15,30 @@ import com.service.ExampaperService;
 import com.utils.PageUtils;
 import com.utils.R;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * 试卷表
  * 后端接口
  */
 @RestController
 @RequestMapping("/exampaper")
+@Tag(name = "试卷管理", description = "试卷的增删改查接口")
 public class ExampaperController {
-
     @Autowired
     private ExampaperService exampaperService;
 
     /**
      * 分页查询
      */
+    @Operation(summary = "分页查询试卷", description = "根据条件分页查询试卷列表")
+    @Parameters({
+        @Parameter(name = "params", description = "分页参数(page: 页码, limit: 每页数量)", required = true),
+        @Parameter(name = "exampaper", description = "试卷查询条件，支持名称模糊查询")
+    })
     @GetMapping("/page")
     public R page(@RequestParam Map<String, Object> params, ExampaperEntity exampaper) {
         QueryWrapper<ExampaperEntity> queryWrapper = new QueryWrapper<>();
@@ -46,6 +56,11 @@ public class ExampaperController {
     /**
      * 获取列表
      */
+    @Operation(summary = "获取试卷列表", description = "获取所有试卷信息，支持条件筛选")
+    @Parameters({
+        @Parameter(name = "params", description = "查询参数"),
+        @Parameter(name = "exampaper", description = "试卷查询条件，支持名称模糊查询")
+    })
     @IgnoreAuth
     @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params, ExampaperEntity exampaper) {
@@ -60,6 +75,8 @@ public class ExampaperController {
     /**
      * 获取配置信息
      */
+    @Operation(summary = "获取试卷详情", description = "根据ID获取试卷详细信息")
+    @Parameter(name = "id", description = "试卷ID", required = true)
     @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id) {
         ExampaperEntity exampaper = exampaperService.getById(id);
@@ -72,6 +89,8 @@ public class ExampaperController {
     /**
      * 新增试卷
      */
+    @Operation(summary = "新增试卷", description = "创建新的试卷")
+    @Parameter(name = "exampaper", description = "试卷信息", required = true)
     @PostMapping("/save")
     public R save(@RequestBody ExampaperEntity exampaper) {
         if (exampaper == null || StringUtils.isBlank(exampaper.getName())) {
@@ -84,6 +103,8 @@ public class ExampaperController {
     /**
      * 修改试卷
      */
+    @Operation(summary = "修改试卷", description = "更新已有的试卷信息")
+    @Parameter(name = "exampaper", description = "试卷信息", required = true)
     @PutMapping("/update")
     public R update(@RequestBody ExampaperEntity exampaper) {
         if (exampaper == null || exampaper.getId() == null) {
@@ -96,6 +117,8 @@ public class ExampaperController {
     /**
      * 删除试卷
      */
+    @Operation(summary = "删除试卷", description = "批量删除试卷")
+    @Parameter(name = "ids", description = "试卷ID数组", required = true)
     @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
         if (ids == null || ids.length == 0) {

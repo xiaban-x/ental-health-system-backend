@@ -31,22 +31,37 @@ import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.ValidatorUtils;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * 登录相关
  */
+/**
+ * 用户管理接口
+ */
+@Tag(name = "用户管理", description = "用户登录注册及信息管理相关接口")
 @RequestMapping("users")
 @RestController
 public class UserController {
-
     @Autowired
     private UserService userService;
-
+    
     @Autowired
     private TokenService tokenService;
 
     /**
      * 登录
      */
+    @Operation(summary = "用户登录", description = "用户登录并返回token")
+    @Parameters({
+        @Parameter(name = "username", description = "用户名", required = true),
+        @Parameter(name = "password", description = "密码", required = true),
+        @Parameter(name = "captcha", description = "验证码"),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @IgnoreAuth
     @PostMapping(value = "/login")
     public R login(String username, String password, String captcha, HttpServletRequest request) {
@@ -61,6 +76,8 @@ public class UserController {
     /**
      * 注册
      */
+    @Operation(summary = "用户注册", description = "新用户注册")
+    @Parameter(name = "user", description = "用户信息", required = true)
     @IgnoreAuth
     @PostMapping(value = "/register")
     public R register(@RequestBody UserEntity user) {
@@ -75,6 +92,8 @@ public class UserController {
     /**
      * 退出
      */
+    @Operation(summary = "用户退出", description = "注销用户登录状态")
+    @Parameter(name = "request", description = "HTTP请求对象")
     @GetMapping(value = "logout")
     public R logout(HttpServletRequest request) {
         request.getSession().invalidate();
@@ -84,6 +103,11 @@ public class UserController {
     /**
      * 密码重置
      */
+    @Operation(summary = "重置密码", description = "重置用户密码为默认密码")
+    @Parameters({
+        @Parameter(name = "username", description = "用户名", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @IgnoreAuth
     @RequestMapping(value = "/resetPass")
     public R resetPass(String username, HttpServletRequest request) {
@@ -99,6 +123,11 @@ public class UserController {
     /**
      * 列表
      */
+    @Operation(summary = "分页查询用户", description = "获取用户信息的分页列表")
+    @Parameters({
+        @Parameter(name = "params", description = "分页参数", required = true),
+        @Parameter(name = "user", description = "用户查询条件")
+    })
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params, UserEntity user) {
         QueryWrapper<UserEntity> ew = new QueryWrapper<UserEntity>();
@@ -110,6 +139,8 @@ public class UserController {
     /**
      * 列表
      */
+    @Operation(summary = "获取用户列表", description = "获取所有用户信息列表")
+    @Parameter(name = "user", description = "用户查询条件")
     @RequestMapping("/list")
     public R list(UserEntity user) {
         QueryWrapper<UserEntity> ew = new QueryWrapper<UserEntity>();
@@ -120,6 +151,8 @@ public class UserController {
     /**
      * 信息
      */
+    @Operation(summary = "获取用户信息", description = "根据ID获取用户详细信息")
+    @Parameter(name = "id", description = "用户ID", required = true)
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") String id) {
         UserEntity user = userService.getById(id);
@@ -129,6 +162,8 @@ public class UserController {
     /**
      * 获取用户的session用户信息
      */
+    @Operation(summary = "获取当前用户信息", description = "获取当前登录用户的详细信息")
+    @Parameter(name = "request", description = "HTTP请求对象")
     @RequestMapping("/session")
     public R getCurrUser(HttpServletRequest request) {
         Long id = (Long) request.getSession().getAttribute("userId");
@@ -139,6 +174,8 @@ public class UserController {
     /**
      * 保存
      */
+    @Operation(summary = "新增用户", description = "添加新用户信息")
+    @Parameter(name = "user", description = "用户信息", required = true)
     @PostMapping("/save")
     public R save(@RequestBody UserEntity user) {
         // ValidatorUtils.validateEntity(user);
@@ -152,6 +189,8 @@ public class UserController {
     /**
      * 修改
      */
+    @Operation(summary = "更新用户信息", description = "更新已有的用户信息")
+    @Parameter(name = "user", description = "用户信息", required = true)
     @RequestMapping("/update")
     public R update(@RequestBody UserEntity user) {
         // ValidatorUtils.validateEntity(user);
@@ -166,6 +205,8 @@ public class UserController {
     /**
      * 删除
      */
+    @Operation(summary = "删除用户", description = "批量删除用户信息")
+    @Parameter(name = "ids", description = "用户ID数组", required = true)
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
         userService.removeBatchByIds(Arrays.asList(ids));

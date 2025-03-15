@@ -13,11 +13,16 @@ import com.entity.view.ExamquestionView;
 import com.service.ExamquestionService;
 import com.utils.PageUtils;
 import com.utils.R;
-import com.utils.ValidatorUtils;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * 试题表 后端接口
  */
+@Tag(name = "试题管理", description = "试题的增删改查接口")
 @RestController
 @RequestMapping("/examquestion")
 public class ExamquestionController {
@@ -27,6 +32,11 @@ public class ExamquestionController {
     /**
      * 后端列表分页
      */
+    @Operation(summary = "后台分页查询", description = "获取试题的分页列表")
+    @Parameters({
+            @Parameter(name = "params", description = "分页参数(page: 页码, limit: 每页数量)", required = true),
+            @Parameter(name = "examquestion", description = "试题查询条件")
+    })
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params, ExamquestionEntity examquestion) {
         QueryWrapper<ExamquestionEntity> queryWrapper = new QueryWrapper<>();
@@ -41,6 +51,11 @@ public class ExamquestionController {
     /**
      * 前端列表分页
      */
+    @Operation(summary = "前台分页查询", description = "前端获取试题的分页列表")
+    @Parameters({
+            @Parameter(name = "params", description = "分页参数(page: 页码, limit: 每页数量)", required = true),
+            @Parameter(name = "examquestion", description = "试题查询条件")
+    })
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params, ExamquestionEntity examquestion) {
         QueryWrapper<ExamquestionEntity> queryWrapper = new QueryWrapper<>();
@@ -55,6 +70,8 @@ public class ExamquestionController {
     /**
      * 列表
      */
+    @Operation(summary = "获取试题列表", description = "获取所有符合条件的试题")
+    @Parameter(name = "examquestion", description = "试题查询条件")
     @RequestMapping("/lists")
     public R lists(ExamquestionEntity examquestion) {
         QueryWrapper<ExamquestionEntity> queryWrapper = new QueryWrapper<>();
@@ -69,6 +86,8 @@ public class ExamquestionController {
     /**
      * 查询
      */
+    @Operation(summary = "查询单个试题", description = "根据条件查询单个试题详情")
+    @Parameter(name = "examquestion", description = "试题查询条件", required = true)
     @RequestMapping("/query")
     public R query(ExamquestionEntity examquestion) {
         QueryWrapper<ExamquestionEntity> queryWrapper = new QueryWrapper<>();
@@ -84,6 +103,8 @@ public class ExamquestionController {
     /**
      * 后端详情
      */
+    @Operation(summary = "获取试题详情", description = "后台根据ID获取试题详情")
+    @Parameter(name = "id", description = "试题ID", required = true)
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id) {
         ExamquestionEntity examquestion = examquestionService.getById(id);
@@ -93,6 +114,8 @@ public class ExamquestionController {
     /**
      * 前端详情
      */
+    @Operation(summary = "前台获取试题详情", description = "前端根据ID获取试题详情")
+    @Parameter(name = "id", description = "试题ID", required = true)
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id) {
         ExamquestionEntity examquestion = examquestionService.getById(id);
@@ -102,6 +125,8 @@ public class ExamquestionController {
     /**
      * 后端保存
      */
+    @Operation(summary = "后台保存试题", description = "后台新增试题信息")
+    @Parameter(name = "examquestion", description = "试题信息", required = true)
     @RequestMapping("/save")
     public R save(@RequestBody ExamquestionEntity examquestion) {
         examquestion.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
@@ -112,6 +137,8 @@ public class ExamquestionController {
     /**
      * 前端保存
      */
+    @Operation(summary = "前台保存试题", description = "前端新增试题信息")
+    @Parameter(name = "examquestion", description = "试题信息", required = true)
     @RequestMapping("/add")
     public R add(@RequestBody ExamquestionEntity examquestion) {
         examquestion.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
@@ -122,6 +149,8 @@ public class ExamquestionController {
     /**
      * 修改
      */
+    @Operation(summary = "更新试题", description = "更新已有的试题信息")
+    @Parameter(name = "examquestion", description = "试题信息", required = true)
     @RequestMapping("/update")
     public R update(@RequestBody ExamquestionEntity examquestion) {
         examquestionService.updateById(examquestion);
@@ -131,6 +160,8 @@ public class ExamquestionController {
     /**
      * 删除
      */
+    @Operation(summary = "删除试题", description = "批量删除试题")
+    @Parameter(name = "ids", description = "试题ID数组", required = true)
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
         examquestionService.removeByIds(Arrays.asList(ids));
@@ -140,6 +171,13 @@ public class ExamquestionController {
     /**
      * 提醒接口
      */
+    @Operation(summary = "获取提醒数量", description = "获取指定列的提醒记录数量")
+    @Parameters({
+            @Parameter(name = "columnName", description = "列名", required = true),
+            @Parameter(name = "type", description = "类型(1:数字 2:日期)", required = true),
+            @Parameter(name = "remindstart", description = "开始提醒天数"),
+            @Parameter(name = "remindend", description = "结束提醒天数")
+    })
     @RequestMapping("/remind/{columnName}/{type}")
     public R remindCount(@PathVariable("columnName") String columnName, @PathVariable("type") String type,
             @RequestParam Map<String, Object> map) {

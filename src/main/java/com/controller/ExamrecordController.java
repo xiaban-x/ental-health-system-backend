@@ -21,16 +21,21 @@ import com.entity.ExamrecordEntity;
 import com.entity.view.ExamrecordView;
 
 import com.service.ExamrecordService;
-import com.service.TokenService;
 import com.utils.PageUtils;
 import com.utils.R;
-import com.utils.MD5Util;
 import com.utils.MPUtil;
-import com.utils.CommonUtil;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+/**
+ * 试卷记录管理接口
+ */
+@Tag(name = "考试记录管理", description = "管理考试记录的相关接口")
 @RestController
 @RequestMapping("/examrecord")
 public class ExamrecordController {
@@ -40,6 +45,12 @@ public class ExamrecordController {
     /**
      * 考试记录接口
      */
+    @Operation(summary = "分组查询考试记录", description = "按条件分组查询考试记录")
+    @Parameters({
+            @Parameter(name = "params", description = "分页和查询参数", required = true),
+            @Parameter(name = "examrecord", description = "考试记录查询条件"),
+            @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/groupby")
     public R page2(@RequestParam Map<String, Object> params, ExamrecordEntity examrecord, HttpServletRequest request) {
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
@@ -55,9 +66,14 @@ public class ExamrecordController {
     /**
      * 后端列表
      */
+    @Operation(summary = "后台分页查询", description = "管理员查看考试记录的分页列表")
+    @Parameters({
+            @Parameter(name = "params", description = "分页参数", required = true),
+            @Parameter(name = "examrecord", description = "考试记录查询条件"),
+            @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params, ExamrecordEntity examrecord,
-            HttpServletRequest request) {
+    public R page(@RequestParam Map<String, Object> params, ExamrecordEntity examrecord, HttpServletRequest request) {
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
             examrecord.setUserid((Long) request.getSession().getAttribute("userId"));
         }
@@ -71,9 +87,14 @@ public class ExamrecordController {
     /**
      * 前端列表
      */
+    @Operation(summary = "前台分页查询", description = "用户查看自己的考试记录")
+    @Parameters({
+            @Parameter(name = "params", description = "分页参数", required = true),
+            @Parameter(name = "examrecord", description = "考试记录查询条件"),
+            @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params, ExamrecordEntity examrecord,
-            HttpServletRequest request) {
+    public R list(@RequestParam Map<String, Object> params, ExamrecordEntity examrecord, HttpServletRequest request) {
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
             examrecord.setUserid((Long) request.getSession().getAttribute("userId"));
         }
@@ -86,6 +107,8 @@ public class ExamrecordController {
     /**
      * 列表
      */
+    @Operation(summary = "获取考试记录列表", description = "获取所有符合条件的考试记录")
+    @Parameter(name = "examrecord", description = "考试记录查询条件")
     @RequestMapping("/lists")
     public R list(ExamrecordEntity examrecord) {
         QueryWrapper<ExamrecordEntity> queryWrapper = new QueryWrapper<>();
@@ -96,6 +119,8 @@ public class ExamrecordController {
     /**
      * 查询
      */
+    @Operation(summary = "查询单个考试记录", description = "根据条件查询单个考试记录详情")
+    @Parameter(name = "examrecord", description = "考试记录查询条件", required = true)
     @RequestMapping("/query")
     public R query(ExamrecordEntity examrecord) {
         QueryWrapper<ExamrecordEntity> queryWrapper = new QueryWrapper<>();
@@ -213,6 +238,11 @@ public class ExamrecordController {
     /**
      * 当重新考试时，删除考生的某个试卷的所有考试记录
      */
+    @Operation(summary = "删除指定考试记录", description = "删除指定用户的指定试卷的所有考试记录")
+    @Parameters({
+            @Parameter(name = "userid", description = "用户ID", required = true),
+            @Parameter(name = "paperid", description = "试卷ID", required = true)
+    })
     @RequestMapping("/deleteRecords")
     public R deleteRecords(@RequestParam Long userid, @RequestParam Long paperid) {
         examrecordService.remove(new QueryWrapper<ExamrecordEntity>().eq("paperid", paperid).eq("userid", userid));

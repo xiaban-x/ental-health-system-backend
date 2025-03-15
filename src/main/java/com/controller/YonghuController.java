@@ -43,6 +43,15 @@ import com.utils.CommonUtil;
  * @email
  * @date 2021-05-04 17:24:35
  */
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+/**
+ * 用户管理接口
+ */
+@Tag(name = "普通用户管理", description = "普通用户的登录注册及信息管理相关接口")
 @RestController
 @RequestMapping("/yonghu")
 public class YonghuController {
@@ -55,6 +64,13 @@ public class YonghuController {
     /**
      * 登录
      */
+    @Operation(summary = "用户登录", description = "普通用户登录并返回token")
+    @Parameters({
+        @Parameter(name = "username", description = "用户账号", required = true),
+        @Parameter(name = "password", description = "密码", required = true),
+        @Parameter(name = "captcha", description = "验证码"),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @IgnoreAuth
     @RequestMapping(value = "/login")
     public R login(String username, String password, String captcha, HttpServletRequest request) {
@@ -70,6 +86,8 @@ public class YonghuController {
     /**
      * 注册
      */
+    @Operation(summary = "用户注册", description = "新用户注册")
+    @Parameter(name = "yonghu", description = "用户信息", required = true)
     @IgnoreAuth
     @RequestMapping("/register")
     public R register(@RequestBody YonghuEntity yonghu) {
@@ -88,6 +106,8 @@ public class YonghuController {
     /**
      * 退出
      */
+    @Operation(summary = "用户退出", description = "注销用户登录状态")
+    @Parameter(name = "request", description = "HTTP请求对象")
     @RequestMapping("/logout")
     public R logout(HttpServletRequest request) {
         request.getSession().invalidate();
@@ -97,6 +117,8 @@ public class YonghuController {
     /**
      * 获取用户的session用户信息
      */
+    @Operation(summary = "获取当前用户信息", description = "获取当前登录用户的会话信息")
+    @Parameter(name = "request", description = "HTTP请求对象")
     @RequestMapping("/session")
     public R getCurrUser(HttpServletRequest request) {
         Long id = (Long) request.getSession().getAttribute("userId");
@@ -107,6 +129,11 @@ public class YonghuController {
     /**
      * 密码重置
      */
+    @Operation(summary = "重置密码", description = "重置用户密码为默认密码123456")
+    @Parameters({
+        @Parameter(name = "username", description = "用户账号", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @IgnoreAuth
     @RequestMapping(value = "/resetPass")
     public R resetPass(String username, HttpServletRequest request) {
@@ -122,6 +149,12 @@ public class YonghuController {
     /**
      * 后端列表
      */
+    @Operation(summary = "后台分页查询", description = "管理员获取用户的分页列表")
+    @Parameters({
+        @Parameter(name = "params", description = "分页参数", required = true),
+        @Parameter(name = "yonghu", description = "用户查询条件"),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/page")
     public R page(@RequestParam Map<String, Object> params, YonghuEntity yonghu,
             HttpServletRequest request) {
@@ -135,6 +168,12 @@ public class YonghuController {
     /**
      * 前端列表
      */
+    @Operation(summary = "前台分页查询", description = "前端获取用户的分页列表")
+    @Parameters({
+        @Parameter(name = "params", description = "分页参数", required = true),
+        @Parameter(name = "yonghu", description = "用户查询条件"),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params, YonghuEntity yonghu,
             HttpServletRequest request) {
@@ -147,6 +186,8 @@ public class YonghuController {
     /**
      * 列表
      */
+    @Operation(summary = "获取用户列表", description = "获取所有用户信息列表")
+    @Parameter(name = "yonghu", description = "用户查询条件")
     @RequestMapping("/lists")
     public R list(YonghuEntity yonghu) {
         QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
@@ -157,6 +198,8 @@ public class YonghuController {
     /**
      * 查询
      */
+    @Operation(summary = "查询单个用户", description = "根据条件查询单个用户详情")
+    @Parameter(name = "yonghu", description = "用户查询条件", required = true)
     @RequestMapping("/query")
     public R query(YonghuEntity yonghu) {
         QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
@@ -177,6 +220,8 @@ public class YonghuController {
     /**
      * 前端详情
      */
+    @Operation(summary = "前台获取用户详情", description = "前端根据ID获取用户详情")
+    @Parameter(name = "id", description = "用户ID", required = true)
     @RequestMapping("/detail/{id}")
     public R detail(@PathVariable("id") Long id) {
         YonghuEntity yonghu = yonghuService.getById(id);
@@ -186,6 +231,11 @@ public class YonghuController {
     /**
      * 后端保存
      */
+    @Operation(summary = "后台保存用户", description = "管理员添加新用户")
+    @Parameters({
+        @Parameter(name = "yonghu", description = "用户信息", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/save")
     public R save(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
         yonghu.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
@@ -203,6 +253,11 @@ public class YonghuController {
     /**
      * 前端保存
      */
+    @Operation(summary = "前台保存用户", description = "前端添加新用户")
+    @Parameters({
+        @Parameter(name = "yonghu", description = "用户信息", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/add")
     public R add(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
         yonghu.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
@@ -220,6 +275,11 @@ public class YonghuController {
     /**
      * 修改
      */
+    @Operation(summary = "更新用户信息", description = "更新已有的用户信息")
+    @Parameters({
+        @Parameter(name = "yonghu", description = "用户信息", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象")
+    })
     @RequestMapping("/update")
     public R update(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
         // ValidatorUtils.validateEntity(yonghu);
@@ -230,6 +290,8 @@ public class YonghuController {
     /**
      * 删除
      */
+    @Operation(summary = "删除用户", description = "批量删除用户信息")
+    @Parameter(name = "ids", description = "用户ID数组", required = true)
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
         yonghuService.removeBatchByIds(Arrays.asList(ids));
@@ -239,6 +301,13 @@ public class YonghuController {
     /**
      * 提醒接口
      */
+    @Operation(summary = "获取提醒记录数", description = "获取指定时间范围内的用户记录数量")
+    @Parameters({
+        @Parameter(name = "columnName", description = "列名", required = true),
+        @Parameter(name = "type", description = "类型(1:数字 2:日期)", required = true),
+        @Parameter(name = "request", description = "HTTP请求对象"),
+        @Parameter(name = "map", description = "包含remindstart和remindend的参数")
+    })
     @RequestMapping("/remind/{columnName}/{type}")
     public R remindCount(@PathVariable("columnName") String columnName, HttpServletRequest request,
             @PathVariable("type") String type, @RequestParam Map<String, Object> map) {

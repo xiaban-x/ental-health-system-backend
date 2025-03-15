@@ -25,7 +25,6 @@ import com.annotation.IgnoreAuth;
 import com.baidu.aip.face.AipFace;
 import com.baidu.aip.face.MatchRequest;
 import com.baidu.aip.util.Base64Util;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.entity.ConfigEntity;
 import com.service.CommonService;
@@ -34,10 +33,19 @@ import com.utils.BaiduUtil;
 import com.utils.FileUtil;
 import com.utils.R;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * 通用接口
+ * 
+ * @author Trae
+ * @version 1.0
  */
 @RestController
+@Tag(name = "通用接口", description = "包括位置查询、人脸比对、数据统计等通用功能")
 public class CommonController {
 	@Autowired
 	private CommonService commonService;
@@ -49,6 +57,11 @@ public class CommonController {
 
 	private static String BAIDU_DITU_AK = null;
 
+	@Operation(summary = "获取地理位置信息", description = "根据经纬度获取位置信息")
+	@Parameters({
+			@Parameter(name = "lng", description = "经度", required = true),
+			@Parameter(name = "lat", description = "纬度", required = true)
+	})
 	@RequestMapping("/location")
 	public R location(String lng, String lat) {
 		if (BAIDU_DITU_AK == null) {
@@ -69,6 +82,11 @@ public class CommonController {
 	 * @param face2 人脸2
 	 * @return
 	 */
+	@Operation(summary = "人脸比对", description = "比对两张人脸图片的相似度")
+	@Parameters({
+			@Parameter(name = "face1", description = "第一张人脸图片", required = true),
+			@Parameter(name = "face2", description = "第二张人脸图片", required = true)
+	})
 	@RequestMapping("/matchFace")
 	public R matchFace(String face1, String face2) {
 		if (client == null) {
@@ -128,9 +146,17 @@ public class CommonController {
 	 * @param column
 	 * @return
 	 */
+	@Operation(summary = "获取选项列表", description = "获取指定表的指定列的所有可选值")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "columnName", description = "列名", required = true),
+			@Parameter(name = "level", description = "层级"),
+			@Parameter(name = "parent", description = "父级")
+	})
 	@IgnoreAuth
 	@RequestMapping("/option/{tableName}/{columnName}")
-	public R getOption(@PathVariable("tableName") String tableName, @PathVariable("columnName") String columnName,
+	public R getOption(@PathVariable("tableName") String tableName,
+			@PathVariable("columnName") String columnName,
 			String level, String parent) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
@@ -152,10 +178,17 @@ public class CommonController {
 	 * @param column
 	 * @return
 	 */
+	@Operation(summary = "获取关联记录", description = "根据表中的列值获取单条记录")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "columnName", description = "列名", required = true),
+			@Parameter(name = "columnValue", description = "列值", required = true)
+	})
 	@IgnoreAuth
 	@RequestMapping("/follow/{tableName}/{columnName}")
 	public R getFollowByOption(@PathVariable("tableName") String tableName,
-			@PathVariable("columnName") String columnName, @RequestParam String columnValue) {
+			@PathVariable("columnName") String columnName,
+			@RequestParam String columnValue) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
 		params.put("column", columnName);
@@ -165,12 +198,13 @@ public class CommonController {
 	}
 
 	/**
-	 * 修改table表的sfsh状态
-	 * 
-	 * @param table
-	 * @param map
-	 * @return
+	 * 修改审核状态
 	 */
+	@Operation(summary = "修改审核状态", description = "修改指定表的审核状态")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "map", description = "包含审核状态的参数", required = true)
+	})
 	@RequestMapping("/sh/{tableName}")
 	public R sh(@PathVariable("tableName") String tableName, @RequestBody Map<String, Object> map) {
 		map.put("table", tableName);
@@ -180,17 +214,21 @@ public class CommonController {
 
 	/**
 	 * 获取需要提醒的记录数
-	 * 
-	 * @param tableName
-	 * @param columnName
-	 * @param type       1:数字 2:日期
-	 * @param map
-	 * @return
 	 */
+	@Operation(summary = "获取提醒记录数", description = "获取需要提醒的记录数量，支持数字和日期类型")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "columnName", description = "列名", required = true),
+			@Parameter(name = "type", description = "类型(1:数字 2:日期)", required = true),
+			@Parameter(name = "remindstart", description = "开始提醒天数"),
+			@Parameter(name = "remindend", description = "结束提醒天数")
+	})
 	@IgnoreAuth
 	@RequestMapping("/remind/{tableName}/{columnName}/{type}")
-	public R remindCount(@PathVariable("tableName") String tableName, @PathVariable("columnName") String columnName,
-			@PathVariable("type") String type, @RequestParam Map<String, Object> map) {
+	public R remindCount(@PathVariable("tableName") String tableName,
+			@PathVariable("columnName") String columnName,
+			@PathVariable("type") String type,
+			@RequestParam Map<String, Object> map) {
 		map.put("table", tableName);
 		map.put("column", columnName);
 		map.put("type", type);
@@ -223,9 +261,15 @@ public class CommonController {
 	/**
 	 * 单列求和
 	 */
+	@Operation(summary = "单列求和", description = "计算指定表指定列的总和")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "columnName", description = "要求和的列名", required = true)
+	})
 	@IgnoreAuth
 	@RequestMapping("/cal/{tableName}/{columnName}")
-	public R cal(@PathVariable("tableName") String tableName, @PathVariable("columnName") String columnName) {
+	public R cal(@PathVariable("tableName") String tableName,
+			@PathVariable("columnName") String columnName) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
 		params.put("column", columnName);
@@ -236,9 +280,15 @@ public class CommonController {
 	/**
 	 * 分组统计
 	 */
+	@Operation(summary = "分组统计", description = "按指定列进行分组统计，支持日期格式化")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "columnName", description = "分组的列名", required = true)
+	})
 	@IgnoreAuth
 	@RequestMapping("/group/{tableName}/{columnName}")
-	public R group(@PathVariable("tableName") String tableName, @PathVariable("columnName") String columnName) {
+	public R group(@PathVariable("tableName") String tableName,
+			@PathVariable("columnName") String columnName) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
 		params.put("column", columnName);
@@ -255,11 +305,18 @@ public class CommonController {
 	}
 
 	/**
-	 * （按值统计）
+	 * 按值统计
 	 */
+	@Operation(summary = "按值统计", description = "按X轴和Y轴进行值统计分析，支持日期格式化")
+	@Parameters({
+			@Parameter(name = "tableName", description = "表名", required = true),
+			@Parameter(name = "xColumnName", description = "X轴列名", required = true),
+			@Parameter(name = "yColumnName", description = "Y轴列名", required = true)
+	})
 	@IgnoreAuth
 	@RequestMapping("/value/{tableName}/{xColumnName}/{yColumnName}")
-	public R value(@PathVariable("tableName") String tableName, @PathVariable("yColumnName") String yColumnName,
+	public R value(@PathVariable("tableName") String tableName,
+			@PathVariable("yColumnName") String yColumnName,
 			@PathVariable("xColumnName") String xColumnName) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("table", tableName);
