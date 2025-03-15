@@ -15,7 +15,11 @@ import com.utils.ValidatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +57,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "普通用户管理", description = "普通用户的登录注册及信息管理相关接口")
 @RestController
-@RequestMapping("/yonghu")
+@RequestMapping("/api/v1/yonghu")
+@Tag(name = "普通用户管理", description = "普通用户的登录注册及信息管理相关接口")
 public class YonghuController {
     @Autowired
     private YonghuService yonghuService;
@@ -62,289 +67,174 @@ public class YonghuController {
     private TokenService tokenService;
 
     /**
-     * 登录
+     * 认证相关接口
      */
+    @PostMapping("/auth/login")
     @Operation(summary = "用户登录", description = "普通用户登录并返回token")
-    @Parameters({
-        @Parameter(name = "username", description = "用户账号", required = true),
-        @Parameter(name = "password", description = "密码", required = true),
-        @Parameter(name = "captcha", description = "验证码"),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
     @IgnoreAuth
-    @RequestMapping(value = "/login")
-    public R login(String username, String password, String captcha, HttpServletRequest request) {
+    public R login(@RequestParam String username,
+            @RequestParam String password,
+            @RequestParam(required = false) String captcha) {
         YonghuEntity user = yonghuService.getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", username));
         if (user == null || !user.getMima().equals(password)) {
             return R.error("账号或密码不正确");
         }
-
         String token = tokenService.generateToken(user.getId(), username, "yonghu", "用户");
         return R.ok().put("token", token);
     }
 
-    /**
-     * 注册
-     */
+    @PostMapping("/auth/register")
     @Operation(summary = "用户注册", description = "新用户注册")
-    @Parameter(name = "yonghu", description = "用户信息", required = true)
     @IgnoreAuth
-    @RequestMapping("/register")
     public R register(@RequestBody YonghuEntity yonghu) {
-        // ValidatorUtils.validateEntity(yonghu);
-        YonghuEntity user = yonghuService
-                .getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", yonghu.getZhanghao()));
-        if (user != null) {
-            return R.error("注册用户已存在");
+        if (yonghuService.getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", yonghu.getZhanghao())) != null) {
+            return R.error("用户已存在");
         }
-        Long uId = new Date().getTime();
-        yonghu.setId(uId);
+        yonghu.setId(new Date().getTime());
         yonghuService.save(yonghu);
+        return R.ok().put("data", yonghu);
+    }
+
+    @PostMapping("/auth/logout")
+    @Operation(summary = "用户退出", description = "注销用户登录状态")
+    public R logout(HttpServletRequest request) {
+        request.getSession().invalidate();
         return R.ok();
     }
 
-    /**
-     * 退出
-     */
-    @Operation(summary = "用户退出", description = "注销用户登录状态")
-    @Parameter(name = "request", description = "HTTP请求对象")
-    @RequestMapping("/logout")
-    public R logout(HttpServletRequest request) {
-        request.getSession().invalidate();
-        return R.ok("退出成功");
-    }
-
-    /**
-     * 获取用户的session用户信息
-     */
-    @Operation(summary = "获取当前用户信息", description = "获取当前登录用户的会话信息")
-    @Parameter(name = "request", description = "HTTP请求对象")
-    @RequestMapping("/session")
-    public R getCurrUser(HttpServletRequest request) {
-        Long id = (Long) request.getSession().getAttribute("userId");
-        YonghuEntity user = yonghuService.getById(id);
-        return R.ok().put("data", user);
-    }
-
-    /**
-     * 密码重置
-     */
-    @Operation(summary = "重置密码", description = "重置用户密码为默认密码123456")
-    @Parameters({
-        @Parameter(name = "username", description = "用户账号", required = true),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
+    @PostMapping("/auth/reset-password")
+    @Operation(summary = "重置密码", description = "重置用户密码为默认密码")
     @IgnoreAuth
-    @RequestMapping(value = "/resetPass")
-    public R resetPass(String username, HttpServletRequest request) {
+    public R resetPassword(@RequestParam String username) {
         YonghuEntity user = yonghuService.getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", username));
         if (user == null) {
             return R.error("账号不存在");
         }
         user.setMima("123456");
         yonghuService.updateById(user);
-        return R.ok("密码已重置为：123456");
+        return R.ok().put("message", "密码已重置为：123456");
     }
 
     /**
-     * 后端列表
+     * 用户管理接口
      */
-    @Operation(summary = "后台分页查询", description = "管理员获取用户的分页列表")
-    @Parameters({
-        @Parameter(name = "params", description = "分页参数", required = true),
-        @Parameter(name = "yonghu", description = "用户查询条件"),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
-    @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params, YonghuEntity yonghu,
-            HttpServletRequest request) {
-        QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
-        PageUtils page = yonghuService.queryPage(params,
-                (QueryWrapper<YonghuEntity>) MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, yonghu), params), params));
+    @GetMapping
+    @Operation(summary = "获取用户列表", description = "分页获取用户列表")
+    public R getUsers(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            YonghuEntity yonghu) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", page);
+        params.put("limit", size);
 
-        return R.ok().put("data", page);
+        QueryWrapper<YonghuEntity> queryWrapper = new QueryWrapper<>();
+        PageUtils pageResult = yonghuService.queryPage(params, queryWrapper);
+        return R.ok().put("data", pageResult);
     }
 
-    /**
-     * 前端列表
-     */
-    @Operation(summary = "前台分页查询", description = "前端获取用户的分页列表")
-    @Parameters({
-        @Parameter(name = "params", description = "分页参数", required = true),
-        @Parameter(name = "yonghu", description = "用户查询条件"),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params, YonghuEntity yonghu,
-            HttpServletRequest request) {
-        QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
-        PageUtils page = yonghuService.queryPage(params,
-                (QueryWrapper<YonghuEntity>) MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, yonghu), params), params));
-        return R.ok().put("data", page);
+    @GetMapping("/{id}")
+    @Operation(summary = "获取用户详情", description = "根据ID获取用户详细信息")
+    public R getUser(@PathVariable Long id) {
+        YonghuEntity user = yonghuService.getById(id);
+        if (user == null) {
+            return R.error("用户不存在");
+        }
+        return R.ok().put("data", user);
     }
 
-    /**
-     * 列表
-     */
-    @Operation(summary = "获取用户列表", description = "获取所有用户信息列表")
-    @Parameter(name = "yonghu", description = "用户查询条件")
-    @RequestMapping("/lists")
-    public R list(YonghuEntity yonghu) {
-        QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
-        ew.allEq(MPUtil.allEQMapPre(yonghu, "yonghu"));
-        return R.ok().put("data", yonghuService.selectListView(ew));
+    @GetMapping("/current")
+    @Operation(summary = "获取当前用户信息", description = "获取当前登录用户信息")
+    public R getCurrentUser(HttpServletRequest request) {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        YonghuEntity user = yonghuService.getById(userId);
+        if (user == null) {
+            return R.error("用户不存在");
+        }
+        return R.ok().put("data", user);
     }
 
-    /**
-     * 查询
-     */
-    @Operation(summary = "查询单个用户", description = "根据条件查询单个用户详情")
-    @Parameter(name = "yonghu", description = "用户查询条件", required = true)
-    @RequestMapping("/query")
-    public R query(YonghuEntity yonghu) {
-        QueryWrapper<YonghuEntity> ew = new QueryWrapper<YonghuEntity>();
-        ew.allEq(MPUtil.allEQMapPre(yonghu, "yonghu"));
-        YonghuView yonghuView = yonghuService.selectView(ew);
-        return R.ok("查询用户成功").put("data", yonghuView);
-    }
-
-    /**
-     * 后端详情
-     */
-    @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id) {
-        YonghuEntity yonghu = yonghuService.getById(id);
-        return R.ok().put("data", yonghu);
-    }
-
-    /**
-     * 前端详情
-     */
-    @Operation(summary = "前台获取用户详情", description = "前端根据ID获取用户详情")
-    @Parameter(name = "id", description = "用户ID", required = true)
-    @RequestMapping("/detail/{id}")
-    public R detail(@PathVariable("id") Long id) {
-        YonghuEntity yonghu = yonghuService.getById(id);
-        return R.ok().put("data", yonghu);
-    }
-
-    /**
-     * 后端保存
-     */
-    @Operation(summary = "后台保存用户", description = "管理员添加新用户")
-    @Parameters({
-        @Parameter(name = "yonghu", description = "用户信息", required = true),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
-    @RequestMapping("/save")
-    public R save(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
-        yonghu.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        // ValidatorUtils.validateEntity(yonghu);
-        YonghuEntity user = yonghuService
-                .getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", yonghu.getZhanghao()));
-        if (user != null) {
+    @PostMapping
+    @Operation(summary = "创建用户", description = "添加新用户")
+    public R createUser(@RequestBody YonghuEntity yonghu) {
+        if (yonghuService.getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", yonghu.getZhanghao())) != null) {
             return R.error("用户已存在");
         }
         yonghu.setId(new Date().getTime());
         yonghuService.save(yonghu);
-        return R.ok();
+        return R.ok().put("data", yonghu);
     }
 
-    /**
-     * 前端保存
-     */
-    @Operation(summary = "前台保存用户", description = "前端添加新用户")
-    @Parameters({
-        @Parameter(name = "yonghu", description = "用户信息", required = true),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
-    @RequestMapping("/add")
-    public R add(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
-        yonghu.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        // ValidatorUtils.validateEntity(yonghu);
-        YonghuEntity user = yonghuService
-                .getOne(new QueryWrapper<YonghuEntity>().eq("zhanghao", yonghu.getZhanghao()));
-        if (user != null) {
-            return R.error("用户已存在");
+    @PutMapping("/{id}")
+    @Operation(summary = "更新用户", description = "更新用户信息")
+    public R updateUser(@PathVariable Long id, @RequestBody YonghuEntity yonghu) {
+        yonghu.setId(id);
+        if (!yonghuService.updateById(yonghu)) {
+            return R.error("更新失败");
         }
-        yonghu.setId(new Date().getTime());
-        yonghuService.save(yonghu);
+        return R.ok().put("data", yonghu);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除用户", description = "删除指定用户")
+    public R deleteUser(@PathVariable Long id) {
+        if (!yonghuService.removeById(id)) {
+            return R.error("删除失败");
+        }
+        return R.ok();
+    }
+
+    @DeleteMapping("/batch")
+    @Operation(summary = "批量删除用户", description = "批量删除多个用户")
+    public R batchDeleteUsers(@RequestBody Long[] ids) {
+        if (ids == null || ids.length == 0) {
+            return R.error("删除ID不能为空");
+        }
+        if (!yonghuService.removeBatchByIds(Arrays.asList(ids))) {
+            return R.error("批量删除失败");
+        }
         return R.ok();
     }
 
     /**
-     * 修改
+     * 统计接口
      */
-    @Operation(summary = "更新用户信息", description = "更新已有的用户信息")
-    @Parameters({
-        @Parameter(name = "yonghu", description = "用户信息", required = true),
-        @Parameter(name = "request", description = "HTTP请求对象")
-    })
-    @RequestMapping("/update")
-    public R update(@RequestBody YonghuEntity yonghu, HttpServletRequest request) {
-        // ValidatorUtils.validateEntity(yonghu);
-        yonghuService.updateById(yonghu);// 全部更新
-        return R.ok();
-    }
+    @GetMapping("/statistics/{columnName}/{type}")
+    @Operation(summary = "获取统计数据", description = "获取指定时间范围内的用户统计数据")
+    public R getStatistics(
+            @PathVariable String columnName,
+            @PathVariable String type,
+            @RequestParam(required = false) Integer remindstart,
+            @RequestParam(required = false) Integer remindend) {
 
-    /**
-     * 删除
-     */
-    @Operation(summary = "删除用户", description = "批量删除用户信息")
-    @Parameter(name = "ids", description = "用户ID数组", required = true)
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids) {
-        yonghuService.removeBatchByIds(Arrays.asList(ids));
-        return R.ok();
-    }
-
-    /**
-     * 提醒接口
-     */
-    @Operation(summary = "获取提醒记录数", description = "获取指定时间范围内的用户记录数量")
-    @Parameters({
-        @Parameter(name = "columnName", description = "列名", required = true),
-        @Parameter(name = "type", description = "类型(1:数字 2:日期)", required = true),
-        @Parameter(name = "request", description = "HTTP请求对象"),
-        @Parameter(name = "map", description = "包含remindstart和remindend的参数")
-    })
-    @RequestMapping("/remind/{columnName}/{type}")
-    public R remindCount(@PathVariable("columnName") String columnName, HttpServletRequest request,
-            @PathVariable("type") String type, @RequestParam Map<String, Object> map) {
-        map.put("column", columnName);
-        map.put("type", type);
+        Map<String, Object> params = new HashMap<>();
+        params.put("column", columnName);
+        params.put("type", type);
 
         if (type.equals("2")) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Calendar c = Calendar.getInstance();
-            Date remindStartDate = null;
-            Date remindEndDate = null;
-            if (map.get("remindstart") != null) {
-                Integer remindStart = Integer.parseInt(map.get("remindstart").toString());
+            if (remindstart != null) {
                 c.setTime(new Date());
-                c.add(Calendar.DAY_OF_MONTH, remindStart);
-                remindStartDate = c.getTime();
-                map.put("remindstart", sdf.format(remindStartDate));
+                c.add(Calendar.DAY_OF_MONTH, remindstart);
+                params.put("remindstart", sdf.format(c.getTime()));
             }
-            if (map.get("remindend") != null) {
-                Integer remindEnd = Integer.parseInt(map.get("remindend").toString());
+            if (remindend != null) {
                 c.setTime(new Date());
-                c.add(Calendar.DAY_OF_MONTH, remindEnd);
-                remindEndDate = c.getTime();
-                map.put("remindend", sdf.format(remindEndDate));
+                c.add(Calendar.DAY_OF_MONTH, remindend);
+                params.put("remindend", sdf.format(c.getTime()));
             }
         }
 
-        Wrapper<YonghuEntity> wrapper = new QueryWrapper<YonghuEntity>();
-        if (map.get("remindstart") != null) {
-            ((QueryWrapper<YonghuEntity>) wrapper).ge(columnName, map.get("remindstart"));
+        QueryWrapper<YonghuEntity> queryWrapper = new QueryWrapper<>();
+        if (params.get("remindstart") != null) {
+            queryWrapper.ge(columnName, params.get("remindstart"));
         }
-        if (map.get("remindend") != null) {
-            ((QueryWrapper<YonghuEntity>) wrapper).le(columnName, map.get("remindend"));
+        if (params.get("remindend") != null) {
+            queryWrapper.le(columnName, params.get("remindend"));
         }
 
-        int count = (int) yonghuService.count(wrapper);
+        int count = (int) yonghuService.count(queryWrapper);
         return R.ok().put("count", count);
     }
-
 }
