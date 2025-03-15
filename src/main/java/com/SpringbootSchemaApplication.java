@@ -6,8 +6,8 @@ import org.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
 @MapperScan("com.dao")
-public class SpringbootSchemaApplication {
+public class SpringBootSchemaApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SpringbootSchemaApplication.class, args);
+        SpringApplication.run(SpringBootSchemaApplication.class, args);
     }
 }

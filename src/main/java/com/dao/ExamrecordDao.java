@@ -1,14 +1,14 @@
 package com.dao;
 
-import com.entity.ExamrecordEntity;
+import com.entity.ExamRecordEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import org.apache.ibatis.annotations.Param;
-import com.entity.vo.ExamrecordVO;
-import com.entity.view.ExamrecordView;
+import com.entity.vo.ExamRecordVO;
+import com.entity.view.ExamRecordView;
 
 /**
  * 考试记录表
@@ -17,17 +17,17 @@ import com.entity.view.ExamrecordView;
  * @email
  * @date 2021-05-04 17:24:35
  */
-public interface ExamrecordDao extends BaseMapper<ExamrecordEntity> {
+public interface ExamRecordDao extends BaseMapper<ExamRecordEntity> {
 
-	List<ExamrecordVO> selectListVO(@Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	List<ExamRecordVO> selectListVO(@Param("ew") Wrapper<ExamRecordEntity> wrapper);
 
-	ExamrecordVO selectVO(@Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	ExamRecordVO selectVO(@Param("ew") Wrapper<ExamRecordEntity> wrapper);
 
-	List<ExamrecordView> selectListView(@Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	List<ExamRecordView> selectListView(@Param("ew") Wrapper<ExamRecordEntity> wrapper);
 
-	List<ExamrecordView> selectListView(Page<ExamrecordView> page, @Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	List<ExamRecordView> selectListView(Page<ExamRecordView> page, @Param("ew") Wrapper<ExamRecordEntity> wrapper);
 
-	ExamrecordView selectView(@Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	ExamRecordView selectView(@Param("ew") Wrapper<ExamRecordEntity> wrapper);
 
-	List<ExamrecordView> selectGroupBy(Page<ExamrecordView> page, @Param("ew") Wrapper<ExamrecordEntity> wrapper);
+	List<ExamRecordView> selectGroupBy(Page<ExamRecordView> page, @Param("ew") Wrapper<ExamRecordEntity> wrapper);
 }

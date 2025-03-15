@@ -1,14 +1,14 @@
 package com.dao;
 
-import com.entity.ExamquestionEntity;
+import com.entity.ExamQuestionEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import org.apache.ibatis.annotations.Param;
-import com.entity.vo.ExamquestionVO;
-import com.entity.view.ExamquestionView;
+import com.entity.vo.ExamQuestionVO;
+import com.entity.view.ExamQuestionView;
 
 /**
  * 试题表
@@ -17,17 +17,17 @@ import com.entity.view.ExamquestionView;
  * @email
  * @date 2021-05-04 17:24:35
  */
-public interface ExamquestionDao extends BaseMapper<ExamquestionEntity> {
+public interface ExamQuestionDao extends BaseMapper<ExamQuestionEntity> {
 
-	List<ExamquestionVO> selectListVO(@Param("ew") Wrapper<ExamquestionEntity> wrapper);
+	List<ExamQuestionVO> selectListVO(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
 
-	ExamquestionVO selectVO(@Param("ew") Wrapper<ExamquestionEntity> wrapper);
+	ExamQuestionVO selectVO(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
 
-	List<ExamquestionView> selectListView(@Param("ew") Wrapper<ExamquestionEntity> wrapper);
+	List<ExamQuestionView> selectListView(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
 
-	List<ExamquestionView> selectListView(Page<ExamquestionView> page,
-			@Param("ew") Wrapper<ExamquestionEntity> wrapper);
+	List<ExamQuestionView> selectListView(Page<ExamQuestionView> page,
+			@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
 
-	ExamquestionView selectView(@Param("ew") Wrapper<ExamquestionEntity> wrapper);
+	ExamQuestionView selectView(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
 
 }

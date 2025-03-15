@@ -1,12 +1,5 @@
 package com.entity.model;
 
-import com.entity.YonghuEntity;
-
-import com.baomidou.mybatisplus.annotation.*;
-import java.util.Date;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 
 /**

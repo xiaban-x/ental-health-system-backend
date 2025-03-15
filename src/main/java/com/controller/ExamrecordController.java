@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entity.ExamrecordEntity;
+import com.entity.ExamRecordEntity;
 
-import com.service.ExamrecordService;
+import com.service.ExamRecordService;
 import com.utils.PageUtils;
 import com.utils.R;
 
@@ -38,9 +38,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/exam-records")
 @Tag(name = "考试记录管理", description = "管理考试记录的相关接口")
-public class ExamrecordController {
+public class ExamRecordController {
     @Autowired
-    private ExamrecordService examrecordService;
+    private ExamRecordService examRecordService;
 
     /**
      * 分页查询考试记录
@@ -50,27 +50,27 @@ public class ExamrecordController {
             @Parameter(name = "page", description = "页码", required = true),
             @Parameter(name = "size", description = "每页数量", required = true),
             @Parameter(name = "groupBy", description = "是否分组"),
-            @Parameter(name = "examrecord", description = "考试记录查询条件")
+            @Parameter(name = "examRecord", description = "考试记录查询条件")
     })
     @GetMapping
     public R getExamRecords(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) Boolean groupBy,
-            ExamrecordEntity examrecord,
+            ExamRecordEntity examRecord,
             HttpServletRequest request) {
 
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            examrecord.setUserid((Long) request.getSession().getAttribute("userId"));
+            examRecord.setUserid((Long) request.getSession().getAttribute("userId"));
         }
 
-        QueryWrapper<ExamrecordEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<ExamRecordEntity> queryWrapper = new QueryWrapper<>();
         PageUtils pageResult;
 
         if (Boolean.TRUE.equals(groupBy)) {
-            pageResult = examrecordService.queryPageGroupBy(Map.of("page", page, "limit", size), queryWrapper);
+            pageResult = examRecordService.queryPageGroupBy(Map.of("page", page, "limit", size), queryWrapper);
         } else {
-            pageResult = examrecordService.queryPage(Map.of("page", page, "limit", size), queryWrapper);
+            pageResult = examRecordService.queryPage(Map.of("page", page, "limit", size), queryWrapper);
         }
 
         return R.ok().put("data", pageResult);
@@ -83,24 +83,24 @@ public class ExamrecordController {
     @Parameter(name = "id", description = "考试记录ID", required = true)
     @GetMapping("/{id}")
     public R getExamRecord(@PathVariable Long id) {
-        ExamrecordEntity examrecord = examrecordService.getById(id);
-        if (examrecord == null) {
+        ExamRecordEntity examRecord = examRecordService.getById(id);
+        if (examRecord == null) {
             return R.error("考试记录不存在");
         }
-        return R.ok().put("data", examrecord);
+        return R.ok().put("data", examRecord);
     }
 
     /**
      * 创建考试记录
      */
     @Operation(summary = "创建考试记录", description = "创建新的考试记录")
-    @Parameter(name = "examrecord", description = "考试记录信息", required = true)
+    @Parameter(name = "examRecord", description = "考试记录信息", required = true)
     @PostMapping
-    public R createExamRecord(@RequestBody ExamrecordEntity examrecord, HttpServletRequest request) {
-        examrecord.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        examrecord.setUserid((Long) request.getSession().getAttribute("userId"));
-        boolean saved = examrecordService.save(examrecord);
-        return saved ? R.ok().put("data", examrecord) : R.error("创建失败");
+    public R createExamRecord(@RequestBody ExamRecordEntity examRecord, HttpServletRequest request) {
+        examRecord.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
+        examRecord.setUserid((Long) request.getSession().getAttribute("userId"));
+        boolean saved = examRecordService.save(examRecord);
+        return saved ? R.ok().put("data", examRecord) : R.error("创建失败");
     }
 
     /**
@@ -109,13 +109,13 @@ public class ExamrecordController {
     @Operation(summary = "更新考试记录", description = "更新已有的考试记录信息")
     @Parameters({
             @Parameter(name = "id", description = "考试记录ID", required = true),
-            @Parameter(name = "examrecord", description = "考试记录信息", required = true)
+            @Parameter(name = "examRecord", description = "考试记录信息", required = true)
     })
     @PutMapping("/{id}")
-    public R updateExamRecord(@PathVariable Long id, @RequestBody ExamrecordEntity examrecord) {
-        examrecord.setId(id);
-        boolean updated = examrecordService.updateById(examrecord);
-        return updated ? R.ok().put("data", examrecord) : R.error("更新失败");
+    public R updateExamRecord(@PathVariable Long id, @RequestBody ExamRecordEntity examRecord) {
+        examRecord.setId(id);
+        boolean updated = examRecordService.updateById(examRecord);
+        return updated ? R.ok().put("data", examRecord) : R.error("更新失败");
     }
 
     /**
@@ -125,7 +125,7 @@ public class ExamrecordController {
     @Parameter(name = "id", description = "考试记录ID", required = true)
     @DeleteMapping("/{id}")
     public R deleteExamRecord(@PathVariable Long id) {
-        boolean removed = examrecordService.removeById(id);
+        boolean removed = examRecordService.removeById(id);
         return removed ? R.ok() : R.error("删除失败");
     }
 
@@ -139,7 +139,7 @@ public class ExamrecordController {
         if (ids == null || ids.length == 0) {
             return R.error("删除ID不能为空");
         }
-        boolean removed = examrecordService.removeByIds(Arrays.asList(ids));
+        boolean removed = examRecordService.removeByIds(Arrays.asList(ids));
         return removed ? R.ok() : R.error("批量删除失败");
     }
 
@@ -180,7 +180,7 @@ public class ExamrecordController {
             }
         }
 
-        QueryWrapper<ExamrecordEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<ExamRecordEntity> queryWrapper = new QueryWrapper<>();
         if (params.get("remindstart") != null) {
             queryWrapper.ge(columnName, params.get("remindstart"));
         }
@@ -191,7 +191,7 @@ public class ExamrecordController {
             queryWrapper.eq("userid", (Long) request.getSession().getAttribute("userId"));
         }
 
-        int count = (int) examrecordService.count(queryWrapper);
+        int count = (int) examRecordService.count(queryWrapper);
         return R.ok().put("count", count);
     }
 
@@ -203,8 +203,8 @@ public class ExamrecordController {
     public R deleteUserPaperRecords(
             @PathVariable("userId") Long userId,
             @PathVariable("paperId") Long paperId) {
-        boolean removed = examrecordService.remove(
-                new QueryWrapper<ExamrecordEntity>()
+        boolean removed = examRecordService.remove(
+                new QueryWrapper<ExamRecordEntity>()
                         .eq("paperid", paperId)
                         .eq("userid", userId));
         return removed ? R.ok() : R.error("删除失败");

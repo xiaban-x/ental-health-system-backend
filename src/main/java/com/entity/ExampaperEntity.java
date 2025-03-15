@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @TableName("exampaper")
-public class ExampaperEntity implements Serializable {
+public class ExamPaperEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**

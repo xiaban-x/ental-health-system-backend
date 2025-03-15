@@ -1,12 +1,5 @@
 package com.entity.model;
 
-import com.entity.ExampaperEntity;
-
-import com.baomidou.mybatisplus.annotation.*;
-import java.util.Date;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 
 /**
@@ -19,7 +12,7 @@ import java.io.Serializable;
  * @email
  * @date 2021-05-04 17:24:35
  */
-public class ExampaperModel implements Serializable {
+public class ExamPaperModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * 配置管理接口
  * 
- * @author Trae
+ * @author xiaban
  * @version 1.0
  */
 @RestController

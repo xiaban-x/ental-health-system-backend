@@ -3,22 +3,22 @@ package com.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.utils.PageUtils;
-import com.entity.ExamquestionEntity;
+import com.entity.ExamQuestionEntity;
 import java.util.List;
 import java.util.Map;
-import com.entity.vo.ExamquestionVO;
-import com.entity.view.ExamquestionView;
+import com.entity.vo.ExamQuestionVO;
+import com.entity.view.ExamQuestionView;
 
-public interface ExamquestionService extends IService<ExamquestionEntity> {
+public interface ExamQuestionService extends IService<ExamQuestionEntity> {
     PageUtils queryPage(Map<String, Object> params);
-    
-    List<ExamquestionVO> selectListVO(QueryWrapper<ExamquestionEntity> wrapper);
-    
-    ExamquestionVO selectVO(QueryWrapper<ExamquestionEntity> wrapper);
-    
-    List<ExamquestionView> selectListView(QueryWrapper<ExamquestionEntity> wrapper);
-    
-    ExamquestionView selectView(QueryWrapper<ExamquestionEntity> wrapper);
-    
-    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamquestionEntity> wrapper);
+
+    List<ExamQuestionVO> selectListVO(QueryWrapper<ExamQuestionEntity> wrapper);
+
+    ExamQuestionVO selectVO(QueryWrapper<ExamQuestionEntity> wrapper);
+
+    List<ExamQuestionView> selectListView(QueryWrapper<ExamQuestionEntity> wrapper);
+
+    ExamQuestionView selectView(QueryWrapper<ExamQuestionEntity> wrapper);
+
+    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamQuestionEntity> wrapper);
 }

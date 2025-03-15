@@ -3,25 +3,25 @@ package com.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.utils.PageUtils;
-import com.entity.ExamrecordEntity;
+import com.entity.ExamRecordEntity;
 import java.util.List;
 import java.util.Map;
-import com.entity.vo.ExamrecordVO;
-import com.entity.view.ExamrecordView;
+import com.entity.vo.ExamRecordVO;
+import com.entity.view.ExamRecordView;
 
-public interface ExamrecordService extends IService<ExamrecordEntity> {
+public interface ExamRecordService extends IService<ExamRecordEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
-    
-    List<ExamrecordVO> selectListVO(QueryWrapper<ExamrecordEntity> wrapper);
-    
-    ExamrecordVO selectVO(QueryWrapper<ExamrecordEntity> wrapper);
-    
-    List<ExamrecordView> selectListView(QueryWrapper<ExamrecordEntity> wrapper);
-    
-    ExamrecordView selectView(QueryWrapper<ExamrecordEntity> wrapper);
-    
-    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamrecordEntity> wrapper);
-    
-    PageUtils queryPageGroupBy(Map<String, Object> params, QueryWrapper<ExamrecordEntity> wrapper);
+
+    List<ExamRecordVO> selectListVO(QueryWrapper<ExamRecordEntity> wrapper);
+
+    ExamRecordVO selectVO(QueryWrapper<ExamRecordEntity> wrapper);
+
+    List<ExamRecordView> selectListView(QueryWrapper<ExamRecordEntity> wrapper);
+
+    ExamRecordView selectView(QueryWrapper<ExamRecordEntity> wrapper);
+
+    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamRecordEntity> wrapper);
+
+    PageUtils queryPageGroupBy(Map<String, Object> params, QueryWrapper<ExamRecordEntity> wrapper);
 }

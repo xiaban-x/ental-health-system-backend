@@ -1,16 +1,11 @@
 package com.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.lang.reflect.InvocationTargetException;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,14 +20,14 @@ import org.apache.commons.beanutils.BeanUtils;
  * @date 2021-05-04 17:24:35
  */
 @TableName("examrecord")
-public class ExamrecordEntity<T> implements Serializable {
+public class ExamRecordEntity<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public ExamrecordEntity() {
+	public ExamRecordEntity() {
 
 	}
 
-	public ExamrecordEntity(T t) {
+	public ExamRecordEntity(T t) {
 		try {
 			BeanUtils.copyProperties(this, t);
 		} catch (IllegalAccessException | InvocationTargetException e) {

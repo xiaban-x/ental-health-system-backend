@@ -3,23 +3,23 @@ package com.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.utils.PageUtils;
-import com.entity.ExampaperEntity;
+import com.entity.ExamPaperEntity;
 import java.util.List;
 import java.util.Map;
-import com.entity.vo.ExampaperVO;
-import com.entity.view.ExampaperView;
+import com.entity.vo.ExamPaperVO;
+import com.entity.view.ExamPaperView;
 
-public interface ExampaperService extends IService<ExampaperEntity> {
+public interface ExamPaperService extends IService<ExamPaperEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
-    
-    List<ExampaperVO> selectListVO(QueryWrapper<ExampaperEntity> wrapper);
-    
-    ExampaperVO selectVO(QueryWrapper<ExampaperEntity> wrapper);
-    
-    List<ExampaperView> selectListView(QueryWrapper<ExampaperEntity> wrapper);
-    
-    ExampaperView selectView(QueryWrapper<ExampaperEntity> wrapper);
-    
-    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExampaperEntity> wrapper);
+
+    List<ExamPaperVO> selectListVO(QueryWrapper<ExamPaperEntity> wrapper);
+
+    ExamPaperVO selectVO(QueryWrapper<ExamPaperEntity> wrapper);
+
+    List<ExamPaperView> selectListView(QueryWrapper<ExamPaperEntity> wrapper);
+
+    ExamPaperView selectView(QueryWrapper<ExamPaperEntity> wrapper);
+
+    PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamPaperEntity> wrapper);
 }

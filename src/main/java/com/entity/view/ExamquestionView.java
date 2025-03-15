@@ -1,6 +1,6 @@
 package com.entity.view;
 
-import com.entity.ExamquestionEntity;
+import com.entity.ExamQuestionEntity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
@@ -18,13 +18,13 @@ import java.io.Serializable;
  * @date 2021-05-04 17:24:35
  */
 @TableName("examquestion")
-public class ExamquestionView extends ExamquestionEntity implements Serializable {
+public class ExamQuestionView extends ExamQuestionEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public ExamquestionView() {
+	public ExamQuestionView() {
 	}
 
-	public ExamquestionView(ExamquestionEntity examquestionEntity) {
+	public ExamQuestionView(ExamQuestionEntity examquestionEntity) {
 		try {
 			BeanUtils.copyProperties(this, examquestionEntity);
 		} catch (IllegalAccessException | InvocationTargetException e) {

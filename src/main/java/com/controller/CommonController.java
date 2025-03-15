@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * 通用接口
  * 
- * @author Trae
+ * @author xiaban
  * @version 1.0
  */
 @RestController
@@ -59,7 +59,7 @@ public class CommonController {
 
 	private static AipFace client = null;
 
-	private static String BAIDU_DITU_AK = null;
+	private static String BAIDU_MAP_AK = null;
 
 	/**
 	 * 获取地理位置信息
@@ -71,14 +71,14 @@ public class CommonController {
 	})
 	@GetMapping("/locations")
 	public R getLocation(@RequestParam String lng, @RequestParam String lat) {
-		if (BAIDU_DITU_AK == null) {
-			BAIDU_DITU_AK = configService.getOne(new QueryWrapper<ConfigEntity>().eq("name", "baidu_ditu_ak"))
+		if (BAIDU_MAP_AK == null) {
+			BAIDU_MAP_AK = configService.getOne(new QueryWrapper<ConfigEntity>().eq("name", "BAIDU_MAP_AK"))
 					.getValue();
-			if (BAIDU_DITU_AK == null) {
-				return R.error("请在配置管理中正确配置baidu_ditu_ak");
+			if (BAIDU_MAP_AK == null) {
+				return R.error("请在配置管理中正确配置BAIDU_MAP_AK");
 			}
 		}
-		Map<String, String> map = BaiduUtil.getCityByLonLat(BAIDU_DITU_AK, lng, lat);
+		Map<String, String> map = BaiduUtil.getCityByLonLat(BAIDU_MAP_AK, lng, lat);
 		return R.ok().put("data", map);
 	}
 

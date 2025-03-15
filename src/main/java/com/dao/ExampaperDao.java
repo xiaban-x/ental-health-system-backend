@@ -3,9 +3,9 @@ package com.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.entity.ExampaperEntity;
-import com.entity.view.ExampaperView;
-import com.entity.vo.ExampaperVO;
+import com.entity.ExamPaperEntity;
+import com.entity.view.ExamPaperView;
+import com.entity.vo.ExamPaperVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -13,16 +13,16 @@ import java.util.List;
 /**
  * 试卷表 DAO
  */
-public interface ExampaperDao extends BaseMapper<ExampaperEntity> {
+public interface ExamPaperDao extends BaseMapper<ExamPaperEntity> {
 
-	List<ExampaperVO> selectListVO(@Param("ew") Wrapper<ExampaperEntity> wrapper);
+	List<ExamPaperVO> selectListVO(@Param("ew") Wrapper<ExamPaperEntity> wrapper);
 
-	ExampaperVO selectVO(@Param("ew") Wrapper<ExampaperEntity> wrapper);
+	ExamPaperVO selectVO(@Param("ew") Wrapper<ExamPaperEntity> wrapper);
 
-	List<ExampaperView> selectListView(@Param("ew") Wrapper<ExampaperEntity> wrapper);
+	List<ExamPaperView> selectListView(@Param("ew") Wrapper<ExamPaperEntity> wrapper);
 
 	// 旧版 Pagination 替换为 Page<T>
-	List<ExampaperView> selectListView(Page<ExampaperView> page, @Param("ew") Wrapper<ExampaperEntity> wrapper);
+	List<ExamPaperView> selectListView(Page<ExamPaperView> page, @Param("ew") Wrapper<ExamPaperEntity> wrapper);
 
-	ExampaperView selectView(@Param("ew") Wrapper<ExampaperEntity> wrapper);
+	ExamPaperView selectView(@Param("ew") Wrapper<ExamPaperEntity> wrapper);
 }

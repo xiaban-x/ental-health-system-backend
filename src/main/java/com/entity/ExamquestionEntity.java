@@ -19,14 +19,14 @@ import org.apache.commons.beanutils.BeanUtils;
  * @date 2021-05-04 17:24:35
  */
 @TableName("examquestion")
-public class ExamquestionEntity<T> implements Serializable {
+public class ExamQuestionEntity<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	public ExamquestionEntity() {
+	public ExamQuestionEntity() {
 
 	}
 
-	public ExamquestionEntity(T t) {
+	public ExamQuestionEntity(T t) {
 		try {
 			BeanUtils.copyProperties(this, t);
 		} catch (IllegalAccessException | InvocationTargetException e) {
