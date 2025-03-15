@@ -1,6 +1,6 @@
 package com.entity.view;
 
-import com.entity.YonghuEntity;
+import com.entity.UserEntity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
@@ -17,16 +17,16 @@ import java.io.Serializable;
  * @email
  * @date 2021-05-04 17:24:35
  */
-@TableName("yonghu")
-public class YonghuView extends YonghuEntity implements Serializable {
+@TableName("user")
+public class UserView extends UserEntity<Object> {
 	private static final long serialVersionUID = 1L;
 
-	public YonghuView() {
+	public UserView() {
 	}
 
-	public YonghuView(YonghuEntity yonghuEntity) {
+	public UserView(UserEntity userEntity) {
 		try {
-			BeanUtils.copyProperties(this, yonghuEntity);
+			BeanUtils.copyProperties(this, userEntity);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

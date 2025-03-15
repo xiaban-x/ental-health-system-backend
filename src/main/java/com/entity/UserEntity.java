@@ -1,22 +1,36 @@
 package com.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Data;
 
 /**
  * 用户
+ * 数据库通用操作实体类（普通增删改查）
+ * 
+ * @author
+ * @email
+ * @date 2021-05-04 17:24:35
  */
-@TableName("users")
-public class UserEntity implements Serializable {
+@TableName("public.user")
+@Data
+public class UserEntity<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@TableId(type = IdType.AUTO)
+	/**
+	 * 主键id
+	 */
+	@TableId(value = "id", type = IdType.AUTO)
 	private Long id;
 
 	/**
-	 * 用户账号
+	 * 账号
 	 */
 	private String username;
 
@@ -26,50 +40,46 @@ public class UserEntity implements Serializable {
 	private String password;
 
 	/**
-	 * 用户类型
+	 * 姓名
 	 */
-	private String role;
 
-	private Date addtime;
+	private String name;
 
-	public String getUsername() {
-		return username;
-	}
+	/**
+	 * 性别
+	 */
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	private String sex;
 
-	public String getPassword() {
-		return password;
-	}
+	/**
+	 * 手机
+	 */
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+	private String phone;
 
-	public String getRole() {
-		return role;
-	}
+	/**
+	 * 邮箱
+	 */
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+	private String email;
 
-	public Date getAddtime() {
-		return addtime;
-	}
+	/**
+	 * 照片
+	 */
 
-	public void setAddtime(Date addtime) {
-		this.addtime = addtime;
-	}
+	private String avatar;
 
-	public Long getId() {
-		return id;
-	}
+	/**
+	 * 备注
+	 */
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	private String remark;
 
+	/**
+	 * 创建时间
+	 */
+	@TableField("created_at") // 添加字段映射
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat
+	private Date created_at;
 }

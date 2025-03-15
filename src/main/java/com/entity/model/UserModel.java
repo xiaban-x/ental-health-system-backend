@@ -12,154 +12,154 @@ import java.io.Serializable;
  * @email
  * @date 2021-05-04 17:24:35
  */
-public class YonghuModel implements Serializable {
+public class UserModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 密码
 	 */
 
-	private String mima;
+	private String password;
 
 	/**
 	 * 姓名
 	 */
 
-	private String xingming;
+	private String name;
 
 	/**
 	 * 性别
 	 */
 
-	private String xingbie;
+	private String sex;
 
 	/**
 	 * 手机
 	 */
 
-	private String shouji;
+	private String phone;
 
 	/**
 	 * 邮箱
 	 */
 
-	private String youxiang;
+	private String email;
 
 	/**
 	 * 照片
 	 */
 
-	private String zhaopian;
+	private String avatar;
 
 	/**
 	 * 备注
 	 */
 
-	private String beizhu;
+	private String remark;
 
 	/**
 	 * 设置：密码
 	 */
 
-	public void setMima(String mima) {
-		this.mima = mima;
+	public void setMima(String password) {
+		this.password = password;
 	}
 
 	/**
 	 * 获取：密码
 	 */
 	public String getMima() {
-		return mima;
+		return password;
 	}
 
 	/**
 	 * 设置：姓名
 	 */
 
-	public void setXingming(String xingming) {
-		this.xingming = xingming;
+	public void setXingming(String name) {
+		this.name = name;
 	}
 
 	/**
 	 * 获取：姓名
 	 */
 	public String getXingming() {
-		return xingming;
+		return name;
 	}
 
 	/**
 	 * 设置：性别
 	 */
 
-	public void setXingbie(String xingbie) {
-		this.xingbie = xingbie;
+	public void setXingbie(String sex) {
+		this.sex = sex;
 	}
 
 	/**
 	 * 获取：性别
 	 */
 	public String getXingbie() {
-		return xingbie;
+		return sex;
 	}
 
 	/**
 	 * 设置：手机
 	 */
 
-	public void setShouji(String shouji) {
-		this.shouji = shouji;
+	public void setShouji(String phone) {
+		this.phone = phone;
 	}
 
 	/**
 	 * 获取：手机
 	 */
 	public String getShouji() {
-		return shouji;
+		return phone;
 	}
 
 	/**
 	 * 设置：邮箱
 	 */
 
-	public void setYouxiang(String youxiang) {
-		this.youxiang = youxiang;
+	public void setYouxiang(String email) {
+		this.email = email;
 	}
 
 	/**
 	 * 获取：邮箱
 	 */
 	public String getYouxiang() {
-		return youxiang;
+		return email;
 	}
 
 	/**
 	 * 设置：照片
 	 */
 
-	public void setZhaopian(String zhaopian) {
-		this.zhaopian = zhaopian;
+	public void setZhaopian(String avatar) {
+		this.avatar = avatar;
 	}
 
 	/**
 	 * 获取：照片
 	 */
 	public String getZhaopian() {
-		return zhaopian;
+		return avatar;
 	}
 
 	/**
 	 * 设置：备注
 	 */
 
-	public void setBeizhu(String beizhu) {
-		this.beizhu = beizhu;
+	public void setBeizhu(String remark) {
+		this.remark = remark;
 	}
 
 	/**
 	 * 获取：备注
 	 */
 	public String getBeizhu() {
-		return beizhu;
+		return remark;
 	}
 
 }
