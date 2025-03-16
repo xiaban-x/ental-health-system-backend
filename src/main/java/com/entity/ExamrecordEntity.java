@@ -2,14 +2,13 @@ package com.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 
-import java.lang.reflect.InvocationTargetException;
-
 import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.commons.beanutils.BeanUtils;
+
+import lombok.Data;
 
 /**
  * 考试记录表
@@ -19,22 +18,10 @@ import org.apache.commons.beanutils.BeanUtils;
  * @email
  * @date 2021-05-04 17:24:35
  */
-@TableName("examrecord")
-public class ExamRecordEntity<T> implements Serializable {
+@TableName("exam_record")
+@Data
+public class ExamRecordEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	public ExamRecordEntity() {
-
-	}
-
-	public ExamRecordEntity(T t) {
-		try {
-			BeanUtils.copyProperties(this, t);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * 主键id
@@ -44,8 +31,8 @@ public class ExamRecordEntity<T> implements Serializable {
 	/**
 	 * 用户id
 	 */
-
-	private Long userid;
+	@TableField("user_id")
+	private Long userId;
 
 	/**
 	 * 用户名
@@ -56,26 +43,26 @@ public class ExamRecordEntity<T> implements Serializable {
 	/**
 	 * 试卷id（外键）
 	 */
-
-	private Long paperid;
+	@TableField("paper_id")
+	private Long paperId;
 
 	/**
 	 * 试卷名称
 	 */
-
-	private String papername;
+	@TableField("paper_name")
+	private String paperName;
 
 	/**
 	 * 试题id（外键）
 	 */
-
-	private Long questionid;
+	@TableField("question_id")
+	private Long questionId;
 
 	/**
 	 * 试题名称
 	 */
-
-	private String questionname;
+	@TableField("question_name")
+	private String questionName;
 
 	/**
 	 * 选项，json字符串
@@ -104,201 +91,29 @@ public class ExamRecordEntity<T> implements Serializable {
 	/**
 	 * 试题得分
 	 */
-
-	private Long myscore;
+	@TableField("user_score")
+	private Long userScore;
 
 	/**
 	 * 考生答案
 	 */
+	@TableField("user_answer")
+	private String userAnswer;
 
-	private String myanswer;
-
+	/**
+	 * 创建时间
+	 */
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-	@DateTimeFormat
-	private Date addtime;
-
-	public Date getAddtime() {
-		return addtime;
-	}
-
-	public void setAddtime(Date addtime) {
-		this.addtime = addtime;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "created_at", fill = FieldFill.INSERT)
+	private Date createdAt;
 
 	/**
-	 * 设置：用户id
+	 * 更新时间
 	 */
-	public void setUserid(Long userid) {
-		this.userid = userid;
-	}
-
-	/**
-	 * 获取：用户id
-	 */
-	public Long getUserid() {
-		return userid;
-	}
-
-	/**
-	 * 设置：用户名
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	/**
-	 * 获取：用户名
-	 */
-	public String getUsername() {
-		return username;
-	}
-
-	/**
-	 * 设置：试卷id（外键）
-	 */
-	public void setPaperid(Long paperid) {
-		this.paperid = paperid;
-	}
-
-	/**
-	 * 获取：试卷id（外键）
-	 */
-	public Long getPaperid() {
-		return paperid;
-	}
-
-	/**
-	 * 设置：试卷名称
-	 */
-	public void setPapername(String papername) {
-		this.papername = papername;
-	}
-
-	/**
-	 * 获取：试卷名称
-	 */
-	public String getPapername() {
-		return papername;
-	}
-
-	/**
-	 * 设置：试题id（外键）
-	 */
-	public void setQuestionid(Long questionid) {
-		this.questionid = questionid;
-	}
-
-	/**
-	 * 获取：试题id（外键）
-	 */
-	public Long getQuestionid() {
-		return questionid;
-	}
-
-	/**
-	 * 设置：试题名称
-	 */
-	public void setQuestionname(String questionname) {
-		this.questionname = questionname;
-	}
-
-	/**
-	 * 获取：试题名称
-	 */
-	public String getQuestionname() {
-		return questionname;
-	}
-
-	/**
-	 * 设置：选项，json字符串
-	 */
-	public void setOptions(String options) {
-		this.options = options;
-	}
-
-	/**
-	 * 获取：选项，json字符串
-	 */
-	public String getOptions() {
-		return options;
-	}
-
-	/**
-	 * 设置：分值
-	 */
-	public void setScore(Long score) {
-		this.score = score;
-	}
-
-	/**
-	 * 获取：分值
-	 */
-	public Long getScore() {
-		return score;
-	}
-
-	/**
-	 * 设置：正确答案
-	 */
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
-
-	/**
-	 * 获取：正确答案
-	 */
-	public String getAnswer() {
-		return answer;
-	}
-
-	/**
-	 * 设置：答案解析
-	 */
-	public void setAnalysis(String analysis) {
-		this.analysis = analysis;
-	}
-
-	/**
-	 * 获取：答案解析
-	 */
-	public String getAnalysis() {
-		return analysis;
-	}
-
-	/**
-	 * 设置：试题得分
-	 */
-	public void setMyscore(Long myscore) {
-		this.myscore = myscore;
-	}
-
-	/**
-	 * 获取：试题得分
-	 */
-	public Long getMyscore() {
-		return myscore;
-	}
-
-	/**
-	 * 设置：考生答案
-	 */
-	public void setMyanswer(String myanswer) {
-		this.myanswer = myanswer;
-	}
-
-	/**
-	 * 获取：考生答案
-	 */
-	public String getMyanswer() {
-		return myanswer;
-	}
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+	private Date updatedAt;
 
 }

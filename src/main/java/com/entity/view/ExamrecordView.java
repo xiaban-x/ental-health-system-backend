@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
 import java.lang.reflect.InvocationTargetException;
 
-import java.io.Serializable;
-
 /**
  * 考试记录表
  * 后端返回视图实体辅助类
@@ -18,7 +16,7 @@ import java.io.Serializable;
  * @date 2021-05-04 17:24:35
  */
 @TableName("examrecord")
-public class ExamRecordView extends ExamRecordEntity implements Serializable {
+public class ExamRecordView extends ExamRecordEntity {
 	private static final long serialVersionUID = 1L;
 
 	public ExamRecordView() {

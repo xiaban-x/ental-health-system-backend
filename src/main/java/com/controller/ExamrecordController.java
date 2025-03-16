@@ -61,7 +61,7 @@ public class ExamRecordController {
             HttpServletRequest request) {
 
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            examRecord.setUserid((Long) request.getSession().getAttribute("userId"));
+            examRecord.setUserId((Long) request.getSession().getAttribute("userId"));
         }
 
         QueryWrapper<ExamRecordEntity> queryWrapper = new QueryWrapper<>();
@@ -98,7 +98,7 @@ public class ExamRecordController {
     @PostMapping
     public R createExamRecord(@RequestBody ExamRecordEntity examRecord, HttpServletRequest request) {
         examRecord.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        examRecord.setUserid((Long) request.getSession().getAttribute("userId"));
+        examRecord.setUserId((Long) request.getSession().getAttribute("userId"));
         boolean saved = examRecordService.save(examRecord);
         return saved ? R.ok().put("data", examRecord) : R.error("创建失败");
     }

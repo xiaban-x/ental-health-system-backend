@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 后端接口
  */
 @RestController
-@RequestMapping("/api/v1/exam-papers") // 改为复数形式，添加版本号
+@RequestMapping("/api/v1/assessment")
 @Tag(name = "试卷管理", description = "试卷的增删改查接口")
 public class ExamPaperController {
     @Autowired
@@ -38,7 +38,7 @@ public class ExamPaperController {
             @Parameter(name = "size", description = "每页数量", required = true),
             @Parameter(name = "name", description = "试卷名称，支持模糊查询")
     })
-    @GetMapping
+    @GetMapping("/list")
     public R getExamPapers(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
@@ -74,7 +74,7 @@ public class ExamPaperController {
     @Parameter(name = "examPaper", description = "试卷信息", required = true)
     @PostMapping
     public R createExamPaper(@RequestBody ExamPaperEntity examPaper) {
-        if (examPaper == null || StringUtils.isBlank(examPaper.getName())) {
+        if (examPaper == null || StringUtils.isBlank(examPaper.getTitle())) {
             return R.error("试卷名称不能为空");
         }
         boolean saved = examPaperService.save(examPaper);

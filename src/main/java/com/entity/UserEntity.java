@@ -20,7 +20,7 @@ import lombok.Data;
  */
 @TableName("public.user")
 @Data
-public class UserEntity<T> implements Serializable {
+public class UserEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -45,6 +45,11 @@ public class UserEntity<T> implements Serializable {
 
 	private String name;
 
+	/**
+	 * 学号
+	 */
+	@TableField("student_id")
+	private String studentId;
 	/**
 	 * 性别
 	 */
@@ -82,4 +87,12 @@ public class UserEntity<T> implements Serializable {
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
 	private Date createdAt;
+
+	/**
+	 * 更新时间
+	 */
+	@TableField("updated_at") // 添加字段映射
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat
+	private Date updatedAt;
 }

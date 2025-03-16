@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@TableName("exampaper")
+@TableName("exam_paper")
 public class ExamPaperEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -27,10 +27,10 @@ public class ExamPaperEntity implements Serializable {
 	/**
 	 * 试卷名称
 	 */
-	private String name;
+	private String title;
 
 	/**
-	 * 考试时长(分钟)
+	 * 问卷时长(分钟)
 	 */
 	private Integer time;
 
@@ -40,10 +40,18 @@ public class ExamPaperEntity implements Serializable {
 	private Integer status;
 
 	/**
-	 * 添加时间
+	 * 创建时间
 	 */
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@TableField(fill = FieldFill.INSERT)
-	private Date addtime;
+	@TableField(value = "created_at", fill = FieldFill.INSERT)
+	private Date createdAt;
+
+	/**
+	 * 更新时间
+	 */
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+	private Date updatedAt;
 }

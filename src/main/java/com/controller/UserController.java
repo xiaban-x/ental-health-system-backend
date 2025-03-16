@@ -192,6 +192,41 @@ public class UserController {
         return R.ok().put("data", user);
     }
 
+    @PutMapping("/profile")
+    @Operation(summary = "更新个人信息", description = "根据token更新当前登录用户的个人信息")
+    public R updateProfile(@RequestHeader("Authorization") String authorization, @RequestBody UserEntity updateInfo) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return R.error("无效的认证头");
+        }
+
+        String token = authorization.substring(7);
+        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
+        if (tokenEntity == null) {
+            return R.error("token已过期或不存在");
+        }
+
+        // 获取当前用户
+        UserEntity currentUser = userService.getById(tokenEntity.getUserid());
+        if (currentUser == null) {
+            return R.error("用户不存在");
+        }
+
+        // 只更新允许的字段
+        currentUser.setName(updateInfo.getName());
+        currentUser.setStudentId(updateInfo.getStudentId());
+        currentUser.setSex(updateInfo.getSex());
+        currentUser.setPhone(updateInfo.getPhone());
+        currentUser.setEmail(updateInfo.getEmail());
+        currentUser.setAvatar(updateInfo.getAvatar());
+
+        // 更新用户信息
+        if (!userService.updateById(currentUser)) {
+            return R.error("更新失败");
+        }
+
+        return R.ok().put("data", currentUser);
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "删除用户", description = "删除指定用户")
     public R deleteUser(@PathVariable Long id) {

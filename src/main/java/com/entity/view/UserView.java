@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import org.apache.commons.beanutils.BeanUtils;
 import java.lang.reflect.InvocationTargetException;
 
-import java.io.Serializable;
-
 /**
  * 用户
  * 后端返回视图实体辅助类
@@ -18,7 +16,7 @@ import java.io.Serializable;
  * @date 2021-05-04 17:24:35
  */
 @TableName("user")
-public class UserView extends UserEntity<Object> {
+public class UserView extends UserEntity {
 	private static final long serialVersionUID = 1L;
 
 	public UserView() {

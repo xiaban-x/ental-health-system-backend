@@ -4,29 +4,29 @@
 <mapper namespace="com.dao.ExamPaperDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-	<resultMap type="com.entity.ExamPaperEntity" id="exampaperMap">
+	<resultMap type="com.entity.ExamPaperEntity" id="examPaperMap">
 		<result property="name" column="name" />
 		<result property="time" column="time" />
 		<result property="status" column="status" />
 	</resultMap>
 
 	<select id="selectListVO"
-		resultType="com.entity.vo.ExamPaperVO"> SELECT * FROM exampaper exampaper <where> 1=1
+		resultType="com.entity.vo.ExamPaperVO"> SELECT * FROM exam_paper exam_paper <where> 1=1
 		${ew.sqlSegment}</where>
 	</select>
 
 	<select id="selectVO"
-		resultType="com.entity.vo.ExamPaperVO"> SELECT exampaper.* FROM exampaper exampaper <where>
+		resultType="com.entity.vo.ExamPaperVO"> SELECT exam_paper.* FROM exam_paper exam_paper <where>
 		1=1 ${ew.sqlSegment}</where>
 	</select>
 
 	<select id="selectListView"
-		resultType="com.entity.view.ExamPaperView"> SELECT exampaper.* FROM exampaper exampaper <where>
+		resultType="com.entity.view.ExamPaperView"> SELECT exam_paper.* FROM exam_paper exam_paper <where>
 		1=1 ${ew.sqlSegment}</where>
 	</select>
 
 	<select id="selectView"
-		resultType="com.entity.view.ExamPaperView"> SELECT * FROM exampaper exampaper <where> 1=1
+		resultType="com.entity.view.ExamPaperView"> SELECT * FROM exam_paper exam_paper <where> 1=1
 		${ew.sqlSegment}</where>
 	</select>
 
