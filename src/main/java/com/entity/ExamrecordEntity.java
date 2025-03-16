@@ -26,7 +26,7 @@ public class ExamRecordEntity implements Serializable {
 	/**
 	 * 主键id
 	 */
-	@TableId
+	@TableId(type = IdType.ASSIGN_ID)
 	private Long id;
 	/**
 	 * 用户id
@@ -106,7 +106,7 @@ public class ExamRecordEntity implements Serializable {
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@TableField(value = "created_at", fill = FieldFill.INSERT)
-	private Date createdAt;
+	private Date createdAt = new Date();
 
 	/**
 	 * 更新时间
@@ -114,6 +114,6 @@ public class ExamRecordEntity implements Serializable {
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
-	private Date updatedAt;
+	private Date updatedAt = new Date();
 
 }
