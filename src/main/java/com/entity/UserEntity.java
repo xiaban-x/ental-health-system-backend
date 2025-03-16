@@ -81,5 +81,5 @@ public class UserEntity<T> implements Serializable {
 	@TableField("created_at") // 添加字段映射
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
-	private Date created_at;
+	private Date createdAt;
 }
