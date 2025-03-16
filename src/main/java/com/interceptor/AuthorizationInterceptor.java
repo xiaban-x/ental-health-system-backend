@@ -70,7 +70,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
         // OAuth 2.0 Bearer Token 认证
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        System.out.println("authHeader ==>" + authHeader);
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
             handleUnauthorized(response, "缺少有效的访问令牌");
             return false;
