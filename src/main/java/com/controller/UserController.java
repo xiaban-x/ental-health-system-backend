@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.annotation.IgnoreAuth;
-
+import com.entity.TokenEntity;
 import com.entity.UserEntity;
 
 import com.service.UserService;
@@ -129,6 +130,7 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "获取用户详情", description = "根据ID获取用户详细信息")
     public R getUser(@PathVariable Long id) {
+        System.out.println("id ==>" + id);
         UserEntity user = userService.getById(id);
         if (user == null) {
             return R.error("用户不存在");
@@ -144,6 +146,25 @@ public class UserController {
         if (user == null) {
             return R.error("用户不存在");
         }
+        return R.ok().put("data", user);
+    }
+
+    @GetMapping("/info")
+    @Operation(summary = "获取用户信息", description = "根据token获取当前登录用户信息")
+    public R getUserInfo(@RequestHeader("token") String token) {
+        System.out.println("token ==>" + token);
+        // 通过token获取TokenEntity
+        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
+        if (tokenEntity == null) {
+            return R.error("token已过期或不存在");
+        }
+
+        // 获取用户信息
+        UserEntity user = userService.getById(tokenEntity.getUserid());
+        if (user == null) {
+            return R.error("用户不存在");
+        }
+
         return R.ok().put("data", user);
     }
 
