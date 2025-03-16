@@ -24,7 +24,7 @@ import com.utils.R;
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
-    public static final String LOGIN_TOKEN_KEY = "Token";
+    public static final String LOGIN_TOKEN_KEY = "token";
 
     @Autowired
     private TokenService tokenService;
@@ -73,9 +73,14 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 从header中获取token
         String token = request.getHeader(LOGIN_TOKEN_KEY);
-
+        if (token == null) {
+            // 尝试从 Authorization 头获取 Bearer token
+            String authHeader = request.getHeader("Authorization");
+            if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7); // 去掉 "Bearer " 前缀
+            }
+        }
         /**
          * 不需要验证权限的方法直接放过
          */
