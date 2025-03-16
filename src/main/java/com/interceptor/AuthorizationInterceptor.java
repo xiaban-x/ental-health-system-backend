@@ -1,6 +1,6 @@
 package com.interceptor;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import com.alibaba.fastjson.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +24,8 @@ import com.utils.R;
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
-    public static final String LOGIN_TOKEN_KEY = "token";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Autowired
     private TokenService tokenService;
@@ -33,86 +34,77 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         // 支持跨域请求
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Headers",
-                "x-requested-with,request-source,Token, Origin,imgType, Content-Type, cache-control,postman-token,Cookie, Accept,authorization");
+                "Authorization, Origin, X-Requested-With, Content-Type, Accept");
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 
-        // 获取请求路径
-        String path = request.getRequestURI();
-        String contextPath = request.getContextPath();
-        if (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
-            path = path.substring(contextPath.length());
-        }
-
-        // 放行 Swagger/SpringDoc 相关路径
-        if (path.startsWith("/swagger-ui") ||
-                path.startsWith("/swagger-ui.html") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-resources") ||
-                path.startsWith("/webjars/") ||
-                path.equals("/error") ||
-                path.contains("api-docs") ||
-                path.contains("swagger")) {
-            System.out.println("Swagger路径放行: " + path);
-            return true;
-        }
-
-        // 跨域时会首先发送一个OPTIONS请求，这里我们给OPTIONS请求直接返回正常状态
+        // 处理预检请求
         if (request.getMethod().equals(RequestMethod.OPTIONS.name())) {
             response.setStatus(HttpStatus.OK.value());
             return false;
         }
 
+        // 获取请求路径
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (StringUtils.isNotEmpty(contextPath) && path.startsWith(contextPath)) {
+            path = path.substring(contextPath.length());
+        }
+
+        // 放行公开路径
+        if (isPublicPath(path)) {
+            return true;
+        }
+
+        // 检查是否需要跳过认证
         IgnoreAuth annotation;
         if (handler instanceof HandlerMethod) {
             annotation = ((HandlerMethod) handler).getMethodAnnotation(IgnoreAuth.class);
-        } else {
-            return true;
-        }
-
-        String token = request.getHeader(LOGIN_TOKEN_KEY);
-        if (token == null) {
-            // 尝试从 Authorization 头获取 Bearer token
-            String authHeader = request.getHeader("Authorization");
-            if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7); // 去掉 "Bearer " 前缀
+            if (annotation != null) {
+                return true;
             }
         }
-        /**
-         * 不需要验证权限的方法直接放过
-         */
-        if (annotation != null) {
-            return true;
+
+        // OAuth 2.0 Bearer Token 认证
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        System.out.println("authHeader ==>" + authHeader);
+        if (StringUtils.isBlank(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
+            handleUnauthorized(response, "缺少有效的访问令牌");
+            return false;
         }
 
-        TokenEntity tokenEntity = null;
-        if (StringUtils.isNotBlank(token)) {
-            tokenEntity = tokenService.getTokenEntity(token);
+        // 提取并验证 token
+        String token = authHeader.substring(BEARER_PREFIX.length());
+        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
+
+        if (tokenEntity == null) {
+            handleUnauthorized(response, "访问令牌无效或已过期");
+            return false;
         }
 
-        if (tokenEntity != null) {
-            request.getSession().setAttribute("userId", tokenEntity.getUserid());
-            request.getSession().setAttribute("role", tokenEntity.getRole());
-            request.getSession().setAttribute("tableName", tokenEntity.getTablename());
-            request.getSession().setAttribute("username", tokenEntity.getUsername());
-            return true;
-        }
+        // 设置认证信息
+        request.setAttribute("userId", tokenEntity.getUserid());
+        request.setAttribute("role", tokenEntity.getRole());
+        request.setAttribute("username", tokenEntity.getUsername());
 
-        PrintWriter writer = null;
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json; charset=utf-8");
-        try {
-            writer = response.getWriter();
-            writer.print(JSONObject.toJSONString(R.error(401, "请先登录")));
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
-        // throw new EIException("请先登录", 401);
-        return false;
+        return true;
+    }
+
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars/") ||
+                path.equals("/error") ||
+                path.contains("api-docs");
+    }
+
+    private void handleUnauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(JSONObject.toJSONString(R.error(401, message)));
     }
 }

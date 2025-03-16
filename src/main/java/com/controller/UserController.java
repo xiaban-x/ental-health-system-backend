@@ -151,9 +151,12 @@ public class UserController {
 
     @GetMapping("/info")
     @Operation(summary = "获取用户信息", description = "根据token获取当前登录用户信息")
-    public R getUserInfo(@RequestHeader("token") String token) {
-        System.out.println("token ==>" + token);
-        // 通过token获取TokenEntity
+    public R getUserInfo(@RequestHeader("Authorization") String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return R.error("无效的认证头");
+        }
+
+        String token = authorization.substring(7); // 去掉 "Bearer " 前缀
         TokenEntity tokenEntity = tokenService.getTokenEntity(token);
         if (tokenEntity == null) {
             return R.error("token已过期或不存在");
