@@ -1,6 +1,7 @@
 package com.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.entity.ExamPaperEntity;
+import com.entity.ExamQuestionEntity;
 import com.service.ExamPaperService;
+import com.service.ExamQuestionService;
 import com.utils.PageUtils;
 import com.utils.R;
 
@@ -28,6 +31,29 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ExamPaperController {
     @Autowired
     private ExamPaperService examPaperService;
+
+    @Autowired
+    private ExamQuestionService examQuestionService;
+
+    /**
+     * 查看试卷下的所有题目
+     * 
+     * @param paperId
+     * @return
+     */
+    @Operation(summary = "查看试卷下的所有题目", description = "根据试卷ID查看试卷下的所有题目")
+    @Parameter(name = "paperId", description = "试卷ID", required = true)
+    @GetMapping("/{paperId}/questions")
+    public R getQuestionsByPaperId(@PathVariable("paperId") Long paperId) {
+
+        // 创建查询试题的QueryWrapper
+        QueryWrapper<ExamQuestionEntity> questionQueryWrapper = new QueryWrapper<>();
+        questionQueryWrapper.eq("paper_id", paperId);
+        // 获取试卷下的所有试题
+        List<ExamQuestionEntity> questionList = examQuestionService.list(questionQueryWrapper);
+
+        return R.ok().put("data", questionList);
+    }
 
     /**
      * 分页查询
