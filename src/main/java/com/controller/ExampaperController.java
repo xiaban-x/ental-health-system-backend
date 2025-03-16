@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,8 +12,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.entity.ExamPaperEntity;
 import com.entity.ExamQuestionEntity;
+import com.entity.ExamRecordEntity;
+import com.entity.TokenEntity;
+import com.entity.dto.AnswerSubmitDTO;
 import com.service.ExamPaperService;
 import com.service.ExamQuestionService;
+import com.service.ExamRecordService;
+import com.service.TokenService;
 import com.utils.PageUtils;
 import com.utils.R;
 
@@ -34,6 +40,12 @@ public class ExamPaperController {
 
     @Autowired
     private ExamQuestionService examQuestionService;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private ExamRecordService examRecordService;
 
     /**
      * 查看试卷下的所有题目
@@ -148,5 +160,83 @@ public class ExamPaperController {
         }
         boolean removed = examPaperService.removeByIds(Arrays.asList(ids));
         return removed ? R.ok() : R.error("批量删除失败");
+    }
+
+    /**
+     * 提交试卷答案
+     */
+    @Operation(summary = "提交试卷答案", description = "提交用户的试卷答案")
+    @Parameters({
+            @Parameter(name = "paperId", description = "试卷ID", required = true),
+            @Parameter(name = "answers", description = "答案列表", required = true)
+    })
+    @PostMapping("/{paperId}/submit")
+    public R submitAnswers(
+            @PathVariable("paperId") Long paperId,
+            @RequestBody AnswerSubmitDTO submitDTO,
+            @RequestHeader("Authorization") String authorization) {
+
+        // 从Authorization头获取token
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return R.error("无效的认证头");
+        }
+        String token = authorization.substring(7);
+
+        // 获取token中的用户信息
+        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
+        if (tokenEntity == null) {
+            return R.error("token已过期或不存在");
+        }
+
+        // 获取试卷信息
+        ExamPaperEntity paper = examPaperService.getById(paperId);
+        if (paper == null) {
+            return R.error("试卷不存在");
+        }
+
+        // 批量保存答案记录
+        List<ExamRecordEntity> records = new ArrayList<>();
+
+        // 修改遍历方式
+        for (AnswerSubmitDTO.Answer answer : submitDTO.getAnswers()) {
+            // 获取题目信息
+            ExamQuestionEntity question = examQuestionService.getById(answer.getQuestionId());
+            if (question == null) {
+                continue;
+            }
+
+            ExamRecordEntity record = new ExamRecordEntity();
+            // 设置用户信息(从token中获取)
+            record.setUserId(tokenEntity.getUserid());
+            record.setUsername(tokenEntity.getUsername());
+
+            record.setPaperId(paperId);
+            record.setPaperName(paper.getTitle());
+            record.setQuestionId(answer.getQuestionId());
+            record.setQuestionName(question.getQuestionName());
+            record.setOptions(question.getOptions());
+            record.setScore(question.getScore());
+            record.setAnswer(question.getAnswer());
+            record.setAnalysis(question.getAnalysis());
+            record.setUserAnswer(answer.getOptionValue());
+
+            // 判断答案是否正确并计算得分
+            if (answer.getOptionValue().equals(question.getAnswer())) {
+                record.setUserScore(question.getScore());
+            } else {
+                record.setUserScore(0L);
+            }
+
+            records.add(record);
+        }
+
+        // 批量保存记录
+        boolean success = examRecordService.saveBatch(records);
+
+        if (!success) {
+            return R.error("提交答案失败");
+        }
+
+        return R.ok().put("data", records);
     }
 }
