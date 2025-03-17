@@ -13,13 +13,13 @@ public class PageUtils implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// 总记录数
-	private long total;
+	private Integer total;
 	// 每页记录数
-	private long pageSize;
+	private Integer pageSize;
 	// 总页数
-	private long totalPage;
+	private Integer totalPage;
 	// 当前页数
-	private long currPage;
+	private Integer currPage;
 	// 列表数据
 	private List<?> list;
 
@@ -31,12 +31,12 @@ public class PageUtils implements Serializable {
 	 * @param pageSize   每页记录数
 	 * @param currPage   当前页数
 	 */
-	public PageUtils(List<?> list, long totalCount, long pageSize, long currPage) {
+	public PageUtils(List<?> list, Integer totalCount, Integer pageSize, Integer currPage) {
 		this.list = list;
 		this.total = totalCount;
 		this.pageSize = pageSize;
 		this.currPage = currPage;
-		this.totalPage = (long) Math.ceil((double) totalCount / pageSize);
+		this.totalPage = (int) Math.ceil((double) totalCount / pageSize);
 	}
 
 	/**
@@ -44,10 +44,10 @@ public class PageUtils implements Serializable {
 	 */
 	public PageUtils(Page<?> page) {
 		this.list = page.getRecords();
-		this.total = page.getTotal();
-		this.pageSize = page.getSize();
-		this.currPage = page.getCurrent();
-		this.totalPage = page.getPages();
+		this.total = (int) page.getTotal();
+		this.pageSize = (int) page.getSize();
+		this.currPage = (int) page.getCurrent();
+		this.totalPage = (int) page.getPages();
 	}
 
 	/**
@@ -56,24 +56,24 @@ public class PageUtils implements Serializable {
 	public PageUtils(Map<String, Object> params) {
 		// 生成 Page 对象并初始化
 		Page<?> page = new Page<>(
-				Long.valueOf(params.get("page").toString()),
-				Long.valueOf(params.get("limit").toString()));
+				Integer.valueOf(params.get("page").toString()),
+				Integer.valueOf(params.get("limit").toString()));
 		new PageUtils(page);
 	}
 
-	public long getPageSize() {
+	public Integer getPageSize() {
 		return pageSize;
 	}
 
-	public void setPageSize(long pageSize) {
+	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
 
-	public long getCurrPage() {
+	public Integer getCurrPage() {
 		return currPage;
 	}
 
-	public void setCurrPage(long currPage) {
+	public void setCurrPage(Integer currPage) {
 		this.currPage = currPage;
 	}
 
@@ -85,19 +85,19 @@ public class PageUtils implements Serializable {
 		this.list = list;
 	}
 
-	public long getTotalPage() {
+	public Integer getTotalPage() {
 		return totalPage;
 	}
 
-	public void setTotalPage(long totalPage) {
+	public void setTotalPage(Integer totalPage) {
 		this.totalPage = totalPage;
 	}
 
-	public long getTotal() {
+	public Integer getTotal() {
 		return total;
 	}
 
-	public void setTotal(long total) {
+	public void setTotal(Integer total) {
 		this.total = total;
 	}
 

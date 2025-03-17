@@ -37,7 +37,7 @@ public class ExamQuestionModel implements Serializable {
 	 * 分值
 	 */
 
-	private Long score;
+	private Integer score;
 
 	/**
 	 * 正确答案
@@ -55,13 +55,13 @@ public class ExamQuestionModel implements Serializable {
 	 * 试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
 	 */
 
-	private Long type;
+	private Integer type;
 
 	/**
 	 * 试题排序，值越大排越前面
 	 */
 
-	private Long sequence;
+	private Integer sequence;
 
 	/**
 	 * 设置：试卷名称
@@ -112,14 +112,14 @@ public class ExamQuestionModel implements Serializable {
 	 * 设置：分值
 	 */
 
-	public void setScore(Long score) {
+	public void setScore(Integer score) {
 		this.score = score;
 	}
 
 	/**
 	 * 获取：分值
 	 */
-	public Long getScore() {
+	public Integer getScore() {
 		return score;
 	}
 
@@ -157,14 +157,14 @@ public class ExamQuestionModel implements Serializable {
 	 * 设置：试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
 	 */
 
-	public void setType(Long type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 
 	/**
 	 * 获取：试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
 	 */
-	public Long getType() {
+	public Integer getType() {
 		return type;
 	}
 
@@ -172,14 +172,14 @@ public class ExamQuestionModel implements Serializable {
 	 * 设置：试题排序，值越大排越前面
 	 */
 
-	public void setSequence(Long sequence) {
+	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
 
 	/**
 	 * 获取：试题排序，值越大排越前面
 	 */
-	public Long getSequence() {
+	public Integer getSequence() {
 		return sequence;
 	}
 

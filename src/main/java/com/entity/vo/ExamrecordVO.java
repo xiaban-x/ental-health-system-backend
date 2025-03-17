@@ -29,7 +29,7 @@ public class ExamRecordVO implements Serializable {
 	 * 试卷id（外键）
 	 */
 	@TableField(value = "paper_id")
-	private Long paperId;
+	private Integer paperId;
 
 	/**
 	 * 试卷名称
@@ -41,7 +41,7 @@ public class ExamRecordVO implements Serializable {
 	 * 试题id（外键）
 	 */
 	@TableField(value = "question_id")
-	private Long questionId;
+	private Integer questionId;
 
 	/**
 	 * 试题名称
@@ -59,7 +59,7 @@ public class ExamRecordVO implements Serializable {
 	 * 分值
 	 */
 
-	private Long score;
+	private Integer score;
 
 	/**
 	 * 正确答案
@@ -77,7 +77,7 @@ public class ExamRecordVO implements Serializable {
 	 * 试题得分
 	 */
 	@TableField(value = "user_score")
-	private Long userScore;
+	private Integer userScore;
 
 	/**
 	 * 考生答案

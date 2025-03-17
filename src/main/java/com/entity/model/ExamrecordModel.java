@@ -25,7 +25,7 @@ public class ExamRecordModel implements Serializable {
 	 * 试卷id（外键）
 	 */
 
-	private Long paperid;
+	private Integer paperid;
 
 	/**
 	 * 试卷名称
@@ -37,7 +37,7 @@ public class ExamRecordModel implements Serializable {
 	 * 试题id（外键）
 	 */
 
-	private Long questionid;
+	private Integer questionid;
 
 	/**
 	 * 试题名称
@@ -55,7 +55,7 @@ public class ExamRecordModel implements Serializable {
 	 * 分值
 	 */
 
-	private Long score;
+	private Integer score;
 
 	/**
 	 * 正确答案
@@ -73,7 +73,7 @@ public class ExamRecordModel implements Serializable {
 	 * 试题得分
 	 */
 
-	private Long myscore;
+	private Integer myscore;
 
 	/**
 	 * 考生答案
@@ -100,14 +100,14 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：试卷id（外键）
 	 */
 
-	public void setPaperid(Long paperid) {
+	public void setPaperid(Integer paperid) {
 		this.paperid = paperid;
 	}
 
 	/**
 	 * 获取：试卷id（外键）
 	 */
-	public Long getPaperid() {
+	public Integer getPaperid() {
 		return paperid;
 	}
 
@@ -130,14 +130,14 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：试题id（外键）
 	 */
 
-	public void setQuestionid(Long questionid) {
+	public void setQuestionid(Integer questionid) {
 		this.questionid = questionid;
 	}
 
 	/**
 	 * 获取：试题id（外键）
 	 */
-	public Long getQuestionid() {
+	public Integer getQuestionid() {
 		return questionid;
 	}
 
@@ -175,14 +175,14 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：分值
 	 */
 
-	public void setScore(Long score) {
+	public void setScore(Integer score) {
 		this.score = score;
 	}
 
 	/**
 	 * 获取：分值
 	 */
-	public Long getScore() {
+	public Integer getScore() {
 		return score;
 	}
 
@@ -220,14 +220,14 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：试题得分
 	 */
 
-	public void setMyscore(Long myscore) {
+	public void setMyscore(Integer myscore) {
 		this.myscore = myscore;
 	}
 
 	/**
 	 * 获取：试题得分
 	 */
-	public Long getMyscore() {
+	public Integer getMyscore() {
 		return myscore;
 	}
 

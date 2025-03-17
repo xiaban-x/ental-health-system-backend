@@ -47,7 +47,7 @@ public class CounselorController {
     @Operation(summary = "获取咨询师详情", description = "根据ID获取咨询师的详细信息")
     @Parameter(name = "id", description = "咨询师ID", required = true)
     @GetMapping("/{id}")
-    public R info(@PathVariable("id") Long id) {
+    public R info(@PathVariable("id") Integer id) {
         CounselorEntity counselor = counselorService.getById(id);
         if (counselor == null) {
             return R.error("咨询师不存在");
@@ -61,7 +61,7 @@ public class CounselorController {
     @Operation(summary = "获取咨询师可用时间段", description = "获取指定咨询师的所有可用预约时间段")
     @Parameter(name = "id", description = "咨询师ID", required = true)
     @GetMapping("/{id}/time-slots")
-    public R timeSlots(@PathVariable("id") Long id) {
+    public R timeSlots(@PathVariable("id") Integer id) {
         QueryWrapper<TimeSlotEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("counselor_id", id);
         queryWrapper.ge("start_time", new Date()); // 只获取当前时间之后的时间段
