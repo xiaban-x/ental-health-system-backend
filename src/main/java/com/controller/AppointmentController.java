@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ import java.util.Map;
  * 预约相关接口
  */
 @RestController
-@RequestMapping("/appointment")
+@RequestMapping("/api/v1/appointment")
 @Tag(name = "预约管理", description = "管理咨询预约的相关接口")
 public class AppointmentController {
 

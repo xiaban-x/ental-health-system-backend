@@ -18,7 +18,7 @@ import java.util.List;
  * 咨询师相关接口
  */
 @RestController
-@RequestMapping("/counselor")
+@RequestMapping("/api/v1/counselor")
 @Tag(name = "咨询师管理", description = "管理咨询师信息的相关接口")
 public class CounselorController {
 
