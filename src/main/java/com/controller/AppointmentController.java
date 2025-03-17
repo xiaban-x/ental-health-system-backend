@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.entity.AppointmentEntity;
 import com.entity.CounselorEntity;
 import com.entity.TimeSlotEntity;
@@ -57,14 +58,14 @@ public class AppointmentController {
     @Transactional
     public R create(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         // 从token中获取用户信息
-        Long userId = (Long) request.getAttribute("userId");
+        Integer userId = (Integer) request.getAttribute("userId");
         UserEntity user = userService.getById(userId);
         if (user == null) {
             return R.error("用户不存在");
         }
 
-        Long counselorId = Long.parseLong(params.get("counselorId").toString());
-        Long timeSlotId = Long.parseLong(params.get("timeSlotId").toString());
+        Integer counselorId = Integer.parseInt(params.get("counselorId").toString());
+        Integer timeSlotId = Integer.parseInt(params.get("timeSlotId").toString());
         String reason = params.get("reason").toString();
 
         // 检查时间段是否可用
@@ -82,6 +83,8 @@ public class AppointmentController {
 
         // 创建预约
         AppointmentEntity appointment = new AppointmentEntity();
+        // 使用雪花算法生成ID
+        appointment.setId((int) IdWorker.getId());
         appointment.setUserId(userId);
         appointment.setUsername(user.getUsername());
         appointment.setCounselorId(counselorId);
@@ -95,7 +98,21 @@ public class AppointmentController {
         appointment.setEndTime(timeSlot.getEndTime());
         appointment.setStatus("pending");
         appointment.setReason(reason);
-        appointmentService.save(appointment);
+
+        try {
+            boolean success = appointmentService.save(appointment);
+            if (!success) {
+                // 如果保存失败，回滚时间段状态
+                timeSlot.setStatus("available");
+                timeSlotService.updateById(timeSlot);
+                return R.error("预约创建失败");
+            }
+        } catch (Exception e) {
+            // 发生异常时，回滚时间段状态
+            timeSlot.setStatus("available");
+            timeSlotService.updateById(timeSlot);
+            return R.error("预约创建失败：" + e.getMessage());
+        }
 
         return R.ok();
     }
@@ -107,13 +124,12 @@ public class AppointmentController {
     @GetMapping("/my-appointments")
     public R myAppointments(HttpServletRequest request) {
         // 从token中获取用户信息
-        Long userId = (Long) request.getAttribute("userId");
+        int userId = (int) request.getAttribute("userId");
 
         QueryWrapper<AppointmentEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
         queryWrapper.orderByDesc("created_at");
         List<AppointmentEntity> list = appointmentService.list(queryWrapper);
-
         return R.ok().put("data", list);
     }
 
@@ -124,9 +140,9 @@ public class AppointmentController {
     @Parameter(name = "id", description = "预约ID", required = true)
     @PostMapping("/{id}/cancel")
     @Transactional
-    public R cancel(@PathVariable("id") Long id, HttpServletRequest request) {
+    public R cancel(@PathVariable("id") Integer id, HttpServletRequest request) {
         // 从token中获取用户信息
-        Long userId = (Long) request.getAttribute("userId");
+        Integer userId = (Integer) request.getAttribute("userId");
 
         AppointmentEntity appointment = appointmentService.getById(id);
         if (appointment == null) {
@@ -134,7 +150,7 @@ public class AppointmentController {
         }
 
         // 检查是否是自己的预约
-        if (!appointment.getUserId().equals(userId)) {
+        if (!userId.equals(appointment.getUserId())) {
             return R.error("无权操作此预约");
         }
 

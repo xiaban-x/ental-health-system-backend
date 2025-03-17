@@ -10,7 +10,7 @@ public class AnswerSubmitDTO {
 
     @Data
     public static class Answer {
-        private Long questionId;
+        private Integer questionId;
         private String optionValue;
     }
 }

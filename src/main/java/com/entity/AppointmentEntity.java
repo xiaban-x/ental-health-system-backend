@@ -21,14 +21,14 @@ public class AppointmentEntity implements Serializable {
     /**
      * 主键id
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId(type = IdType.ASSIGN_ID)
+    private int id;
 
     /**
      * 用户id
      */
     @TableField("user_id")
-    private Long userId;
+    private int userId;
 
     /**
      * 用户名
@@ -39,7 +39,7 @@ public class AppointmentEntity implements Serializable {
      * 咨询师id
      */
     @TableField("counselor_id")
-    private Long counselorId;
+    private int counselorId;
 
     /**
      * 咨询师姓名
@@ -51,7 +51,7 @@ public class AppointmentEntity implements Serializable {
      * 时间段id
      */
     @TableField("time_slot_id")
-    private Long timeSlotId;
+    private int timeSlotId;
 
     /**
      * 开始时间

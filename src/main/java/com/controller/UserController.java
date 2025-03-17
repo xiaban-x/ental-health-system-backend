@@ -84,7 +84,7 @@ public class UserController {
         if (userService.getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
             return R.error("用户已存在");
         }
-        user.setId(new Date().getTime());
+        user.setId((int) new Date().getTime());
         userService.save(user);
         return R.ok().put("data", user);
     }
@@ -129,7 +129,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取用户详情", description = "根据ID获取用户详细信息")
-    public R getUser(@PathVariable Long id) {
+    public R getUser(@PathVariable Integer id) {
         System.out.println("id ==>" + id);
         UserEntity user = userService.getById(id);
         if (user == null) {
@@ -141,7 +141,7 @@ public class UserController {
     @GetMapping("/current")
     @Operation(summary = "获取当前用户信息", description = "获取当前登录用户信息")
     public R getCurrentUser(HttpServletRequest request) {
-        Long userId = (Long) request.getSession().getAttribute("userId");
+        Integer userId = (Integer) request.getSession().getAttribute("userId");
         UserEntity user = userService.getById(userId);
         if (user == null) {
             return R.error("用户不存在");
@@ -177,14 +177,14 @@ public class UserController {
         if (userService.getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
             return R.error("用户已存在");
         }
-        user.setId(new Date().getTime());
+        user.setId((int) new Date().getTime());
         userService.save(user);
         return R.ok().put("data", user);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "更新用户", description = "更新用户信息")
-    public R updateUser(@PathVariable Long id, @RequestBody UserEntity user) {
+    public R updateUser(@PathVariable Integer id, @RequestBody UserEntity user) {
         user.setId(id);
         if (!userService.updateById(user)) {
             return R.error("更新失败");
@@ -229,7 +229,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除用户", description = "删除指定用户")
-    public R deleteUser(@PathVariable Long id) {
+    public R deleteUser(@PathVariable Integer id) {
         if (!userService.removeById(id)) {
             return R.error("删除失败");
         }
@@ -238,7 +238,7 @@ public class UserController {
 
     @DeleteMapping("/batch")
     @Operation(summary = "批量删除用户", description = "批量删除多个用户")
-    public R batchDeleteUsers(@RequestBody Long[] ids) {
+    public R batchDeleteUsers(@RequestBody Integer[] ids) {
         if (ids == null || ids.length == 0) {
             return R.error("删除ID不能为空");
         }

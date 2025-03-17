@@ -27,12 +27,12 @@ public class ExamQuestionEntity implements Serializable {
 	 * 主键id
 	 */
 	@TableId
-	private Long id;
+	private Integer id;
 	/**
 	 * 所属试卷id（外键）
 	 */
 	@TableField("paper_id")
-	private Long paperId;
+	private Integer paperId;
 
 	/**
 	 * 试卷名称
@@ -56,7 +56,7 @@ public class ExamQuestionEntity implements Serializable {
 	 * 分值
 	 */
 
-	private Long score;
+	private Integer score;
 
 	/**
 	 * 正确答案
@@ -74,13 +74,13 @@ public class ExamQuestionEntity implements Serializable {
 	 * 试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
 	 */
 
-	private Long type;
+	private Integer type;
 
 	/**
 	 * 试题排序，值越大排越前面
 	 */
 
-	private Long sequence;
+	private Integer sequence;
 
 	/**
 	 * 创建时间

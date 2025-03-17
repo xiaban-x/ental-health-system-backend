@@ -10,12 +10,12 @@ import com.utils.PageUtils;
 
 public interface TokenService extends IService<TokenEntity> {
     PageUtils queryPage(Map<String, Object> params);
-    
+
     List<TokenEntity> selectListView(QueryWrapper<TokenEntity> wrapper);
-    
+
     PageUtils queryPage(Map<String, Object> params, QueryWrapper<TokenEntity> wrapper);
-    
-    String generateToken(Long userid, String username, String tableName, String role);
-    
+
+    String generateToken(Integer userid, String username, String tableName, String role);
+
     TokenEntity getTokenEntity(String token);
 }

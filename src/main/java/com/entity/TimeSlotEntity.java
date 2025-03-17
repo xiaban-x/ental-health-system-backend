@@ -22,13 +22,13 @@ public class TimeSlotEntity implements Serializable {
      * 主键id
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 咨询师id
      */
     @TableField("counselor_id")
-    private Long counselorId;
+    private Integer counselorId;
 
     /**
      * 开始时间

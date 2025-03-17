@@ -56,7 +56,7 @@ public class ExamPaperController {
     @Operation(summary = "查看试卷下的所有题目", description = "根据试卷ID查看试卷下的所有题目")
     @Parameter(name = "paperId", description = "试卷ID", required = true)
     @GetMapping("/{paperId}/questions")
-    public R getQuestionsByPaperId(@PathVariable("paperId") Long paperId) {
+    public R getQuestionsByPaperId(@PathVariable("paperId") Integer paperId) {
 
         // 创建查询试题的QueryWrapper
         QueryWrapper<ExamQuestionEntity> questionQueryWrapper = new QueryWrapper<>();
@@ -97,7 +97,7 @@ public class ExamPaperController {
     @Operation(summary = "获取试卷详情", description = "根据ID获取试卷详细信息")
     @Parameter(name = "id", description = "试卷ID", required = true)
     @GetMapping("/{id}")
-    public R getExamPaper(@PathVariable("id") Long id) {
+    public R getExamPaper(@PathVariable("id") Integer id) {
         ExamPaperEntity examPaper = examPaperService.getById(id);
         if (examPaper == null) {
             return R.error("未找到对应的试卷");
@@ -128,7 +128,7 @@ public class ExamPaperController {
             @Parameter(name = "examPaper", description = "试卷信息", required = true)
     })
     @PutMapping("/{id}")
-    public R updateExamPaper(@PathVariable Long id, @RequestBody ExamPaperEntity examPaper) {
+    public R updateExamPaper(@PathVariable Integer id, @RequestBody ExamPaperEntity examPaper) {
         if (examPaper == null) {
             return R.error("试卷信息不能为空");
         }
@@ -143,7 +143,7 @@ public class ExamPaperController {
     @Operation(summary = "删除试卷", description = "删除指定的试卷")
     @Parameter(name = "id", description = "试卷ID", required = true)
     @DeleteMapping("/{id}")
-    public R deleteExamPaper(@PathVariable Long id) {
+    public R deleteExamPaper(@PathVariable Integer id) {
         boolean removed = examPaperService.removeById(id);
         return removed ? R.ok() : R.error("删除失败");
     }
@@ -154,7 +154,7 @@ public class ExamPaperController {
     @Operation(summary = "批量删除试卷", description = "批量删除多个试卷")
     @Parameter(name = "ids", description = "试卷ID数组", required = true)
     @DeleteMapping("/batch")
-    public R batchDeleteExamPapers(@RequestBody Long[] ids) {
+    public R batchDeleteExamPapers(@RequestBody Integer[] ids) {
         if (ids == null || ids.length == 0) {
             return R.error("删除ID不能为空");
         }
@@ -172,7 +172,7 @@ public class ExamPaperController {
     })
     @PostMapping("/{paperId}/submit")
     public R submitAnswers(
-            @PathVariable("paperId") Long paperId,
+            @PathVariable("paperId") Integer paperId,
             @RequestBody AnswerSubmitDTO submitDTO,
             @RequestHeader("Authorization") String authorization) {
 
@@ -224,7 +224,7 @@ public class ExamPaperController {
             if (answer.getOptionValue().equals(question.getAnswer())) {
                 record.setUserScore(question.getScore());
             } else {
-                record.setUserScore(0L);
+                record.setUserScore(0);
             }
 
             records.add(record);

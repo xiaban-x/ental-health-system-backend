@@ -27,12 +27,12 @@ public class ExamRecordEntity implements Serializable {
 	 * 主键id
 	 */
 	@TableId(type = IdType.ASSIGN_ID)
-	private Long id;
+	private Integer id;
 	/**
 	 * 用户id
 	 */
 	@TableField("user_id")
-	private Long userId;
+	private Integer userId;
 
 	/**
 	 * 用户名
@@ -44,7 +44,7 @@ public class ExamRecordEntity implements Serializable {
 	 * 试卷id（外键）
 	 */
 	@TableField("paper_id")
-	private Long paperId;
+	private Integer paperId;
 
 	/**
 	 * 试卷名称
@@ -56,7 +56,7 @@ public class ExamRecordEntity implements Serializable {
 	 * 试题id（外键）
 	 */
 	@TableField("question_id")
-	private Long questionId;
+	private Integer questionId;
 
 	/**
 	 * 试题名称
@@ -74,7 +74,7 @@ public class ExamRecordEntity implements Serializable {
 	 * 分值
 	 */
 
-	private Long score;
+	private Integer score;
 
 	/**
 	 * 正确答案
@@ -92,7 +92,7 @@ public class ExamRecordEntity implements Serializable {
 	 * 试题得分
 	 */
 	@TableField("user_score")
-	private Long userScore;
+	private Integer userScore;
 
 	/**
 	 * 考生答案

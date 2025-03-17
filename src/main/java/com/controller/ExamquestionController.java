@@ -60,7 +60,7 @@ public class ExamQuestionController {
     @Operation(summary = "获取试题详情", description = "根据ID获取试题详细信息")
     @Parameter(name = "id", description = "试题ID", required = true)
     @GetMapping("/{id}")
-    public R getQuestion(@PathVariable("id") Long id) {
+    public R getQuestion(@PathVariable("id") Integer id) {
         ExamQuestionEntity examQuestion = examQuestionService.getById(id);
         if (examQuestion == null) {
             return R.error("试题不存在");
@@ -76,7 +76,7 @@ public class ExamQuestionController {
     @PostMapping
     public R createQuestion(@RequestBody ExamQuestionEntity examQuestion) {
         // 使用雪花算法或其他更可靠的ID生成方式
-        examQuestion.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
+        examQuestion.setId((int) (new Date().getTime() + Math.floor(Math.random() * 1000)));
         boolean saved = examQuestionService.save(examQuestion);
         return saved ? R.ok().put("data", examQuestion) : R.error("创建失败");
     }
@@ -90,7 +90,7 @@ public class ExamQuestionController {
             @Parameter(name = "examQuestion", description = "试题信息", required = true)
     })
     @PutMapping("/{id}")
-    public R updateQuestion(@PathVariable Long id, @RequestBody ExamQuestionEntity examQuestion) {
+    public R updateQuestion(@PathVariable Integer id, @RequestBody ExamQuestionEntity examQuestion) {
         examQuestion.setId(id);
         boolean updated = examQuestionService.updateById(examQuestion);
         return updated ? R.ok().put("data", examQuestion) : R.error("更新失败");
@@ -102,7 +102,7 @@ public class ExamQuestionController {
     @Operation(summary = "删除试题", description = "删除指定的试题")
     @Parameter(name = "id", description = "试题ID", required = true)
     @DeleteMapping("/{id}")
-    public R deleteQuestion(@PathVariable Long id) {
+    public R deleteQuestion(@PathVariable Integer id) {
         boolean removed = examQuestionService.removeById(id);
         return removed ? R.ok() : R.error("删除失败");
     }
@@ -113,7 +113,7 @@ public class ExamQuestionController {
     @Operation(summary = "批量删除试题", description = "批量删除多个试题")
     @Parameter(name = "ids", description = "试题ID数组", required = true)
     @DeleteMapping("/batch")
-    public R batchDeleteQuestions(@RequestBody Long[] ids) {
+    public R batchDeleteQuestions(@RequestBody Integer[] ids) {
         if (ids == null || ids.length == 0) {
             return R.error("删除ID不能为空");
         }

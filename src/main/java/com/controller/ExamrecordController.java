@@ -61,7 +61,7 @@ public class ExamRecordController {
             HttpServletRequest request) {
 
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            examRecord.setUserId((Long) request.getSession().getAttribute("userId"));
+            examRecord.setUserId((Integer) request.getSession().getAttribute("userId"));
         }
 
         QueryWrapper<ExamRecordEntity> queryWrapper = new QueryWrapper<>();
@@ -82,7 +82,7 @@ public class ExamRecordController {
     @Operation(summary = "获取考试记录详情", description = "根据ID获取考试记录详细信息")
     @Parameter(name = "id", description = "考试记录ID", required = true)
     @GetMapping("/{id}")
-    public R getExamRecord(@PathVariable Long id) {
+    public R getExamRecord(@PathVariable Integer id) {
         ExamRecordEntity examRecord = examRecordService.getById(id);
         if (examRecord == null) {
             return R.error("考试记录不存在");
@@ -97,8 +97,8 @@ public class ExamRecordController {
     @Parameter(name = "examRecord", description = "考试记录信息", required = true)
     @PostMapping
     public R createExamRecord(@RequestBody ExamRecordEntity examRecord, HttpServletRequest request) {
-        examRecord.setId(new Date().getTime() + new Double(Math.floor(Math.random() * 1000)).longValue());
-        examRecord.setUserId((Long) request.getSession().getAttribute("userId"));
+        examRecord.setId((int) (new Date().getTime() + new Double(Math.floor(Math.random() * 1000))));
+        examRecord.setUserId((Integer) request.getSession().getAttribute("userId"));
         boolean saved = examRecordService.save(examRecord);
         return saved ? R.ok().put("data", examRecord) : R.error("创建失败");
     }
@@ -112,7 +112,7 @@ public class ExamRecordController {
             @Parameter(name = "examRecord", description = "考试记录信息", required = true)
     })
     @PutMapping("/{id}")
-    public R updateExamRecord(@PathVariable Long id, @RequestBody ExamRecordEntity examRecord) {
+    public R updateExamRecord(@PathVariable Integer id, @RequestBody ExamRecordEntity examRecord) {
         examRecord.setId(id);
         boolean updated = examRecordService.updateById(examRecord);
         return updated ? R.ok().put("data", examRecord) : R.error("更新失败");
@@ -124,7 +124,7 @@ public class ExamRecordController {
     @Operation(summary = "删除考试记录", description = "删除指定的考试记录")
     @Parameter(name = "id", description = "考试记录ID", required = true)
     @DeleteMapping("/{id}")
-    public R deleteExamRecord(@PathVariable Long id) {
+    public R deleteExamRecord(@PathVariable Integer id) {
         boolean removed = examRecordService.removeById(id);
         return removed ? R.ok() : R.error("删除失败");
     }
@@ -135,7 +135,7 @@ public class ExamRecordController {
     @Operation(summary = "批量删除考试记录", description = "批量删除多个考试记录")
     @Parameter(name = "ids", description = "考试记录ID数组", required = true)
     @DeleteMapping("/batch")
-    public R batchDeleteExamRecords(@RequestBody Long[] ids) {
+    public R batchDeleteExamRecords(@RequestBody Integer[] ids) {
         if (ids == null || ids.length == 0) {
             return R.error("删除ID不能为空");
         }
@@ -188,7 +188,7 @@ public class ExamRecordController {
             queryWrapper.le(columnName, params.get("remindend"));
         }
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            queryWrapper.eq("userid", (Long) request.getSession().getAttribute("userId"));
+            queryWrapper.eq("userid", (Integer) request.getSession().getAttribute("userId"));
         }
 
         int count = (int) examRecordService.count(queryWrapper);
@@ -201,8 +201,8 @@ public class ExamRecordController {
     @Operation(summary = "删除用户试卷记录", description = "删除指定用户的指定试卷的所有考试记录")
     @DeleteMapping("/users/{userId}/papers/{paperId}")
     public R deleteUserPaperRecords(
-            @PathVariable("userId") Long userId,
-            @PathVariable("paperId") Long paperId) {
+            @PathVariable("userId") Integer userId,
+            @PathVariable("paperId") Integer paperId) {
         boolean removed = examRecordService.remove(
                 new QueryWrapper<ExamRecordEntity>()
                         .eq("paperid", paperId)

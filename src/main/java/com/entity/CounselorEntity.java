@@ -22,7 +22,7 @@ public class CounselorEntity implements Serializable {
      * 主键id
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 咨询师姓名

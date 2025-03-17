@@ -22,7 +22,7 @@ public class ExamPaperEntity implements Serializable {
 	 * 主键id
 	 */
 	@TableId(type = IdType.AUTO)
-	private Long id;
+	private Integer id;
 
 	/**
 	 * 试卷名称

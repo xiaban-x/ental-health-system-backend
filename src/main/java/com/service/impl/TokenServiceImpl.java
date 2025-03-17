@@ -46,7 +46,7 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
     }
 
     @Override
-    public String generateToken(Long userid, String username, String tableName, String role) {
+    public String generateToken(Integer userid, String username, String tableName, String role) {
         TokenEntity tokenEntity = this.getOne(new QueryWrapper<TokenEntity>()
                 .eq("userid", userid)
                 .eq("role", role));
@@ -59,7 +59,14 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
             tokenEntity.setExpiratedtime(cal.getTime());
             this.updateById(tokenEntity);
         } else {
-            this.save(new TokenEntity(userid, username, tableName, role, token, cal.getTime()));
+            TokenEntity newToken = new TokenEntity();
+            newToken.setUserid(userid);
+            newToken.setUsername(username);
+            newToken.setTablename(tableName);
+            newToken.setRole(role);
+            newToken.setToken(token);
+            newToken.setExpiratedtime(cal.getTime());
+            this.save(newToken);
         }
         return token;
     }
