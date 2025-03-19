@@ -18,49 +18,52 @@ public class UserVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * 用户ID
+	 */
+	private Integer id;
+
+	/**
+	 * 用户名
+	 */
+	private String username;
+
+	/**
 	 * 密码
 	 */
-
 	private String password;
 
 	/**
 	 * 姓名
 	 */
-
 	private String name;
-
-	/**
-	 * 学号
-	 */
-	private String studentId;
 
 	/**
 	 * 性别
 	 */
-
 	private String sex;
 
 	/**
 	 * 手机
 	 */
-
 	private String phone;
 
 	/**
 	 * 邮箱
 	 */
-
 	private String email;
 
 	/**
 	 * 照片
 	 */
-
 	private String avatar;
+
+	/**
+	 * 角色
+	 */
+	private String role;
 
 	/**
 	 * 备注
 	 */
-
 	private String remark;
 }

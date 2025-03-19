@@ -1,51 +1,39 @@
 package com.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.annotation.IgnoreAuth;
-import com.entity.TokenEntity;
-import com.entity.UserEntity;
+import java.util.Map;
 
-import com.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import com.annotation.IgnoreAuth;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.entity.DoctorEntity;
+import com.entity.StudentEntity;
+import com.entity.TeacherEntity;
+import com.entity.UserEntity;
+import com.service.DoctorService;
+import com.service.StudentService;
+import com.service.TeacherService;
 import com.service.TokenService;
-import com.utils.PageUtils;
+import com.service.UserService;
+import com.utils.MD5Util;
 import com.utils.R;
 
-/**
- * 用户
- * 后端接口
- * 
- * @author
- * @email
- * @date 2021-05-04 17:24:35
- */
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * 用户管理接口
+ * 用户相关接口
  */
-@Tag(name = "用户管理", description = "用户的登录注册及信息管理相关接口")
 @RestController
-@RequestMapping("/api/v1/user")
-@Tag(name = "用户管理", description = "用户的登录注册及信息管理相关接口")
+@RequestMapping("/api/v1/users")
+@Tag(name = "用户管理", description = "用户注册、登录、信息管理相关接口")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -53,240 +41,241 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private StudentService studentService;
+
+    @Autowired
+    private TeacherService teacherService;
+
+    @Autowired
+    private DoctorService doctorService;
+
     /**
-     * 认证相关接口
+     * 用户注册
      */
-    @PostMapping("/auth/login")
-    @Operation(summary = "用户登录", description = "普通用户登录并返回token")
+    @Operation(summary = "用户注册", description = "创建新用户并根据角色创建对应的角色信息")
+    @Parameters({
+            @Parameter(name = "username", description = "用户名", required = true),
+            @Parameter(name = "password", description = "密码", required = true),
+            @Parameter(name = "role", description = "角色(student/teacher/doctor)", required = true)
+    })
     @IgnoreAuth
-    public R login(@RequestBody Map<String, String> loginData) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
-        String captcha = loginData.get("captcha");
-
-        if (username == null || password == null) {
-            return R.error("账号和密码不能为空");
+    @PostMapping("/register")
+    @Transactional
+    public R register(@RequestBody Map<String, Object> params) {
+        String username = params.get("username").toString();
+        String password = params.get("password").toString();
+        String role = params.get("role").toString();
+        System.out.println("paramas ===>" + params);
+        // 验证角色是否有效
+        if (!role.equals("student") && !role.equals("teacher") && !role.equals("doctor")) {
+            return R.error("无效的角色类型");
         }
 
-        UserEntity user = userService.getOne(new QueryWrapper<UserEntity>().eq("username", username));
-        if (user == null || !user.getPassword().equals(password)) {
-            return R.error("账号或密码不正确");
+        // 检查用户名是否已存在
+        UserEntity existUser = userService.getOne(new QueryWrapper<UserEntity>().eq("username", username));
+        if (existUser != null) {
+            return R.error("用户名已存在");
         }
-        String token = tokenService.generateToken(user.getId(), username, "user", "用户");
-        return R.ok().put("token", token).put("user", user);
-    }
 
-    @PostMapping("/auth/register")
-    @Operation(summary = "用户注册", description = "新用户注册")
-    @IgnoreAuth
-    public R register(@RequestBody UserEntity user) {
-        System.out.println("user ==>" + user + user.getUsername());
-        if (userService.getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
-            return R.error("用户已存在");
+        // 创建用户
+        UserEntity user = new UserEntity();
+        user.setUsername(username);
+        user.setPassword(MD5Util.md5(password));
+        user.setRole(role);
+        user.setName(params.get("name") != null ? params.get("name").toString() : username);
+
+        // 设置创建和更新时间
+        Date now = new Date();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
+        if (params.get("sex") != null) {
+            user.setSex(params.get("sex").toString());
         }
-        user.setId((int) new Date().getTime());
-        userService.save(user);
-        return R.ok().put("data", user);
-    }
+        if (params.get("phone") != null) {
+            user.setPhone(params.get("phone").toString());
+        }
+        if (params.get("email") != null) {
+            user.setEmail(params.get("email").toString());
+        }
+        if (params.get("avatar") != null) {
+            user.setAvatar(params.get("avatar").toString());
+        }
 
-    @PostMapping("/auth/logout")
-    @Operation(summary = "用户退出", description = "注销用户登录状态")
-    public R logout(HttpServletRequest request) {
-        request.getSession().invalidate();
+        // 使用MyBatis-Plus的saveOrUpdate方法可能会更好地处理ID生成
+        boolean saved = userService.saveOrUpdate(user);
+        if (!saved) {
+            return R.error("用户创建失败");
+        }
+
+        // 根据角色创建对应的角色信息
+        if ("student".equals(role)) {
+            StudentEntity student = new StudentEntity();
+            student.setUserId(user.getId());
+            student.setStudentId(params.get("studentId") != null ? params.get("studentId").toString() : "");
+            student.setMajor(params.get("major") != null ? params.get("major").toString() : "");
+            student.setClassName(params.get("className") != null ? params.get("className").toString() : "");
+            student.setGrade(params.get("grade") != null ? params.get("grade").toString() : "");
+            studentService.save(student);
+        } else if ("teacher".equals(role)) {
+            TeacherEntity teacher = new TeacherEntity();
+            teacher.setUserId(user.getId());
+            teacher.setEmployeeId(params.get("employeeId") != null ? params.get("employeeId").toString() : "");
+            teacher.setTitle(params.get("title") != null ? params.get("title").toString() : "");
+            teacher.setDepartment(params.get("department") != null ? params.get("department").toString() : "");
+            teacher.setResearchField(params.get("researchField") != null ? params.get("researchField").toString() : "");
+            teacherService.save(teacher);
+        } else if ("doctor".equals(role)) {
+            DoctorEntity doctor = new DoctorEntity();
+            doctor.setUserId(user.getId());
+            doctor.setLicenseNumber(params.get("licenseNumber") != null ? params.get("licenseNumber").toString() : "");
+            doctor.setTitle(params.get("title") != null ? params.get("title").toString() : "");
+            doctor.setLevel(params.get("level") != null ? params.get("level").toString() : "");
+            doctor.setSpecialty(params.get("specialty") != null ? params.get("specialty").toString() : "");
+            doctor.setDepartment(params.get("department") != null ? params.get("department").toString() : "");
+            if (params.get("experienceYears") != null) {
+                try {
+                    doctor.setExperienceYears(Integer.parseInt(params.get("experienceYears").toString()));
+                } catch (NumberFormatException e) {
+                    // 忽略转换错误
+                }
+            }
+            doctorService.save(doctor);
+        }
+
         return R.ok();
     }
 
-    @PostMapping("/auth/reset-password")
-    @Operation(summary = "重置密码", description = "重置用户密码为默认密码")
+    /**
+     * 用户登录
+     */
+    @Operation(summary = "用户登录", description = "用户登录并返回token")
+    @Parameters({
+            @Parameter(name = "username", description = "用户名", required = true),
+            @Parameter(name = "password", description = "密码", required = true)
+    })
     @IgnoreAuth
-    public R resetPassword(@RequestParam String username) {
+    @PostMapping("/login")
+    public R login(@RequestBody Map<String, Object> params) {
+        String username = params.get("username").toString();
+        String password = params.get("password").toString();
+
         UserEntity user = userService.getOne(new QueryWrapper<UserEntity>().eq("username", username));
-        if (user == null) {
-            return R.error("账号不存在");
+        if (user == null || !user.getPassword().equals(MD5Util.md5(password))) {
+            return R.error("用户名或密码错误");
         }
-        user.setPassword("123456");
-        userService.updateById(user);
-        return R.ok().put("message", "密码已重置为：123456");
+
+        // 生成token
+        String token = tokenService.generateToken(user.getId(), username, "user", user.getRole());
+
+        // 获取角色信息
+        Map<String, Object> roleInfo = null;
+        if ("student".equals(user.getRole())) {
+            StudentEntity student = studentService.getByUserId(user.getId());
+            if (student != null) {
+                roleInfo = Map.of(
+                        "studentId", student.getStudentId(),
+                        "major", student.getMajor(),
+                        "className", student.getClassName(),
+                        "grade", student.getGrade());
+            }
+        } else if ("teacher".equals(user.getRole())) {
+            TeacherEntity teacher = teacherService.getByUserId(user.getId());
+            if (teacher != null) {
+                roleInfo = Map.of(
+                        "employeeId", teacher.getEmployeeId(),
+                        "title", teacher.getTitle(),
+                        "department", teacher.getDepartment(),
+                        "researchField", teacher.getResearchField());
+            }
+        } else if ("doctor".equals(user.getRole())) {
+            DoctorEntity doctor = doctorService.getByUserId(user.getId());
+            if (doctor != null) {
+                roleInfo = Map.of(
+                        "licenseNumber", doctor.getLicenseNumber(),
+                        "title", doctor.getTitle(),
+                        "level", doctor.getLevel(),
+                        "specialty", doctor.getSpecialty(),
+                        "department", doctor.getDepartment(),
+                        "experienceYears", doctor.getExperienceYears());
+            }
+        }
+
+        return R.ok()
+                .put("token", token)
+                .put("userId", user.getId())
+                .put("username", user.getUsername())
+                .put("role", user.getRole())
+                .put("roleInfo", roleInfo);
     }
 
     /**
-     * 用户管理接口
+     * 获取用户信息
      */
-    @GetMapping
-    @Operation(summary = "获取用户列表", description = "分页获取用户列表")
-    public R getUsers(
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            UserEntity user) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("page", page);
-        params.put("limit", size);
-
-        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
-        PageUtils pageResult = userService.queryPage(params, queryWrapper);
-        return R.ok().put("data", pageResult);
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "获取用户详情", description = "根据ID获取用户详细信息")
-    public R getUser(@PathVariable Integer id) {
-        System.out.println("id ==>" + id);
-        UserEntity user = userService.getById(id);
-        if (user == null) {
-            return R.error("用户不存在");
-        }
-        return R.ok().put("data", user);
-    }
-
-    @GetMapping("/current")
-    @Operation(summary = "获取当前用户信息", description = "获取当前登录用户信息")
-    public R getCurrentUser(HttpServletRequest request) {
-        Integer userId = (Integer) request.getSession().getAttribute("userId");
+    @Operation(summary = "获取用户信息", description = "获取当前登录用户的信息")
+    @GetMapping("/profile")
+    public R info(HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
         UserEntity user = userService.getById(userId);
         if (user == null) {
             return R.error("用户不存在");
         }
-        return R.ok().put("data", user);
+
+        // 获取角色信息
+        Object roleInfo = null;
+        if ("student".equals(user.getRole())) {
+            roleInfo = studentService.getByUserId(userId);
+        } else if ("teacher".equals(user.getRole())) {
+            roleInfo = teacherService.getByUserId(userId);
+        } else if ("doctor".equals(user.getRole())) {
+            roleInfo = doctorService.getByUserId(userId);
+        }
+
+        return R.ok().put("user", user).put("roleInfo", roleInfo);
     }
 
-    @GetMapping("/info")
-    @Operation(summary = "获取用户信息", description = "根据token获取当前登录用户信息")
-    public R getUserInfo(@RequestHeader("Authorization") String authorization) {
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return R.error("无效的认证头");
-        }
-
-        String token = authorization.substring(7); // 去掉 "Bearer " 前缀
-        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
-        if (tokenEntity == null) {
-            return R.error("token已过期或不存在");
-        }
-
-        // 获取用户信息
-        UserEntity user = userService.getById(tokenEntity.getUserid());
-        if (user == null) {
-            return R.error("用户不存在");
-        }
-
-        return R.ok().put("data", user);
-    }
-
-    @PostMapping
-    @Operation(summary = "创建用户", description = "添加新用户")
-    public R createUser(@RequestBody UserEntity user) {
-        if (userService.getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
-            return R.error("用户已存在");
-        }
-        user.setId((int) new Date().getTime());
-        userService.save(user);
-        return R.ok().put("data", user);
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "更新用户", description = "更新用户信息")
-    public R updateUser(@PathVariable Integer id, @RequestBody UserEntity user) {
-        user.setId(id);
-        if (!userService.updateById(user)) {
-            return R.error("更新失败");
-        }
-        return R.ok().put("data", user);
-    }
-
+    /**
+     * 修改用户信息
+     */
+    @Operation(summary = "修改用户信息", description = "修改当前登录用户的基本信息")
     @PutMapping("/profile")
-    @Operation(summary = "更新个人信息", description = "根据token更新当前登录用户的个人信息")
-    public R updateProfile(@RequestHeader("Authorization") String authorization, @RequestBody UserEntity updateInfo) {
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return R.error("无效的认证头");
-        }
-
-        String token = authorization.substring(7);
-        TokenEntity tokenEntity = tokenService.getTokenEntity(token);
-        if (tokenEntity == null) {
-            return R.error("token已过期或不存在");
-        }
-
-        // 获取当前用户
-        UserEntity currentUser = userService.getById(tokenEntity.getUserid());
-        if (currentUser == null) {
-            return R.error("用户不存在");
-        }
-
-        // 只更新允许的字段
-        currentUser.setName(updateInfo.getName());
-        currentUser.setStudentId(updateInfo.getStudentId());
-        currentUser.setSex(updateInfo.getSex());
-        currentUser.setPhone(updateInfo.getPhone());
-        currentUser.setEmail(updateInfo.getEmail());
-        currentUser.setAvatar(updateInfo.getAvatar());
-
-        // 更新用户信息
-        if (!userService.updateById(currentUser)) {
-            return R.error("更新失败");
-        }
-
-        return R.ok().put("data", currentUser);
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "删除用户", description = "删除指定用户")
-    public R deleteUser(@PathVariable Integer id) {
-        if (!userService.removeById(id)) {
-            return R.error("删除失败");
-        }
-        return R.ok();
-    }
-
-    @DeleteMapping("/batch")
-    @Operation(summary = "批量删除用户", description = "批量删除多个用户")
-    public R batchDeleteUsers(@RequestBody Integer[] ids) {
-        if (ids == null || ids.length == 0) {
-            return R.error("删除ID不能为空");
-        }
-        if (!userService.removeBatchByIds(Arrays.asList(ids))) {
-            return R.error("批量删除失败");
-        }
+    public R update(@RequestBody UserEntity user, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        user.setId(userId);
+        // 不允许修改用户名和密码
+        user.setUsername(null);
+        user.setPassword(null);
+        userService.updateById(user);
         return R.ok();
     }
 
     /**
-     * 统计接口
+     * 修改密码
      */
-    @GetMapping("/statistics/{columnName}/{type}")
-    @Operation(summary = "获取统计数据", description = "获取指定时间范围内的用户统计数据")
-    public R getStatistics(
-            @PathVariable String columnName,
-            @PathVariable String type,
-            @RequestParam(required = false) Integer remindstart,
-            @RequestParam(required = false) Integer remindend) {
+    @Operation(summary = "修改密码", description = "修改当前登录用户的密码")
+    @Parameters({
+            @Parameter(name = "oldPassword", description = "旧密码", required = true),
+            @Parameter(name = "newPassword", description = "新密码", required = true)
+    })
+    @PutMapping("/password")
+    public R updatePassword(@RequestBody Map<String, Object> params, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        String oldPassword = params.get("oldPassword").toString();
+        String newPassword = params.get("newPassword").toString();
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("column", columnName);
-        params.put("type", type);
-
-        if (type.equals("2")) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar c = Calendar.getInstance();
-            if (remindstart != null) {
-                c.setTime(new Date());
-                c.add(Calendar.DAY_OF_MONTH, remindstart);
-                params.put("remindstart", sdf.format(c.getTime()));
-            }
-            if (remindend != null) {
-                c.setTime(new Date());
-                c.add(Calendar.DAY_OF_MONTH, remindend);
-                params.put("remindend", sdf.format(c.getTime()));
-            }
+        UserEntity user = userService.getById(userId);
+        if (user == null) {
+            return R.error("用户不存在");
         }
 
-        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
-        if (params.get("remindstart") != null) {
-            queryWrapper.ge(columnName, params.get("remindstart"));
-        }
-        if (params.get("remindend") != null) {
-            queryWrapper.le(columnName, params.get("remindend"));
+        if (!user.getPassword().equals(MD5Util.md5(oldPassword))) {
+            return R.error("原密码错误");
         }
 
-        int count = (int) userService.count(queryWrapper);
-        return R.ok().put("count", count);
+        user.setPassword(MD5Util.md5(newPassword));
+        userService.updateById(user);
+
+        return R.ok();
     }
 }

@@ -5,6 +5,7 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
 	<resultMap type="com.entity.UserEntity" id="userMap">
+		<result property="id" column="id" />
 		<result property="username" column="username" />
 		<result property="password" column="password" />
 		<result property="name" column="name" />
@@ -14,6 +15,8 @@
 		<result property="avatar" column="avatar" />
 		<result property="role" column="role" />
 		<result property="remark" column="remark" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
 	</resultMap>
 
 	<select id="selectListVO"

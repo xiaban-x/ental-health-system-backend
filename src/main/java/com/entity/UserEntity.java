@@ -11,12 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * 用户
+ * 用户基础信息
  * 数据库通用操作实体类（普通增删改查）
- * 
- * @author
- * @email
- * @date 2021-05-04 17:24:35
  */
 @TableName("public.user")
 @Data
@@ -26,7 +22,7 @@ public class UserEntity implements Serializable {
 	/**
 	 * 主键id
 	 */
-	@TableId(value = "id", type = IdType.AUTO)
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
 	private Integer id;
 
 	/**
@@ -42,62 +38,51 @@ public class UserEntity implements Serializable {
 	/**
 	 * 姓名
 	 */
-
 	private String name;
 
 	/**
-	 * 学号
-	 */
-	@TableField("student_id")
-	private String studentId;
-	/**
 	 * 性别
 	 */
-
 	private String sex;
 
 	/**
 	 * 手机
 	 */
-
 	private String phone;
 
 	/**
 	 * 邮箱
 	 */
-
 	private String email;
 
 	/**
 	 * 照片
 	 */
-
 	private String avatar;
 
 	/**
-	 * 角色
+	 * 角色 (student, teacher, doctor)
 	 */
 	private String role;
 
 	/**
 	 * 备注
 	 */
-
 	private String remark;
 
 	/**
 	 * 创建时间
 	 */
-	@TableField("created_at") // 添加字段映射
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-	@DateTimeFormat
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "created_at", fill = FieldFill.INSERT)
 	private Date createdAt;
 
 	/**
 	 * 更新时间
 	 */
-	@TableField("updated_at") // 添加字段映射
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-	@DateTimeFormat
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
 	private Date updatedAt;
 }

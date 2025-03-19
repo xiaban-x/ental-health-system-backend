@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.DoctorDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.entity.DoctorEntity" id="doctorMap">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="licenseNumber" column="license_number" />
+		<result property="title" column="title" />
+		<result property="level" column="level" />
+		<result property="specialty" column="specialty" />
+		<result property="department" column="department" />
+		<result property="experienceYears" column="experience_years" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
+	</resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.DoctorVO"> SELECT * FROM doctor doctor <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+	<select id="selectVO"
+		resultType="com.entity.vo.DoctorVO"> SELECT doctor.* FROM doctor doctor <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+	<select id="selectListView"
+		resultType="com.entity.view.DoctorView"> SELECT doctor.* FROM doctor doctor <where> 1=1
+		${ew.sqlSegment}</where>
+	</select>
+
+	<select id="selectView"
+		resultType="com.entity.view.DoctorView"> SELECT * FROM doctor doctor <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<!-- 移除不存在的VO类引用 -->
+	<select id="selectByUserId"
+		resultType="com.entity.DoctorEntity"> SELECT * FROM doctor WHERE user_id = #{userId}
+	</select>
+
+</mapper>

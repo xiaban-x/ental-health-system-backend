@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.StudentDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap type="com.entity.StudentEntity" id="studentMap">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="studentId" column="student_id" />
+		<result property="major" column="major" />
+		<result property="className" column="class_name" />
+		<result property="grade" column="grade" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
+	</resultMap>
+
+	<!-- 只保留必要的查询 -->
+	<select id="selectByUserId"
+		resultType="com.entity.StudentEntity"> SELECT * FROM student WHERE user_id = #{userId}
+	</select>
+
+</mapper>
