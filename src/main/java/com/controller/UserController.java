@@ -1,6 +1,7 @@
 package com.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,7 +233,12 @@ public class UserController {
             roleInfo = doctorService.getByUserId(userId);
         }
 
-        return R.ok().put("user", user).put("roleInfo", roleInfo);
+        // 创建包含user和roleInfo的Map作为data字段的值
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", user);
+        data.put("roleInfo", roleInfo);
+
+        return R.ok().put("data", data);
     }
 
     /**
