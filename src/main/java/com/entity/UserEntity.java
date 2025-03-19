@@ -75,6 +75,11 @@ public class UserEntity implements Serializable {
 	private String avatar;
 
 	/**
+	 * 角色
+	 */
+	private String role;
+
+	/**
 	 * 备注
 	 */
 

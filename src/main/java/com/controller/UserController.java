@@ -73,7 +73,7 @@ public class UserController {
             return R.error("账号或密码不正确");
         }
         String token = tokenService.generateToken(user.getId(), username, "user", "用户");
-        return R.ok().put("token", token);
+        return R.ok().put("token", token).put("user", user);
     }
 
     @PostMapping("/auth/register")
