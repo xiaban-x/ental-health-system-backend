@@ -27,6 +27,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 试卷表
  * 后端接口
@@ -46,6 +48,47 @@ public class ExamPaperController {
 
     @Autowired
     private ExamRecordService examRecordService;
+
+    /**
+     * 根据当前用户分页查询试卷
+     */
+    @Operation(summary = "获取我的试卷", description = "获取当前登录用户的试卷分页列表")
+    @Parameters({
+            @Parameter(name = "page", description = "页码", required = true),
+            @Parameter(name = "size", description = "每页数量", required = true),
+            @Parameter(name = "title", description = "试卷标题，支持模糊查询")
+    })
+    @GetMapping("/my-papers")
+    public R getMyPapers(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String title,
+            HttpServletRequest request) {
+
+        // 从请求中获取用户ID
+        Integer userId = (Integer) request.getAttribute("userId");
+        if (userId == null) {
+            return R.error("用户未登录");
+        }
+
+        QueryWrapper<ExamPaperEntity> queryWrapper = new QueryWrapper<>();
+        // 添加用户ID条件
+        queryWrapper.eq("user_id", userId);
+
+        // 添加标题模糊查询条件
+        if (StringUtils.isNotBlank(title)) {
+            queryWrapper.like("title", title);
+        }
+
+        // 按创建时间降序排序
+        queryWrapper.orderByDesc("created_at");
+
+        Page<ExamPaperEntity> pageResult = examPaperService.page(
+                new Page<>(page, size),
+                queryWrapper);
+
+        return R.ok().put("data", PageUtils.convert(pageResult));
+    }
 
     /**
      * 查看试卷下的所有题目
@@ -238,5 +281,43 @@ public class ExamPaperController {
         }
 
         return R.ok().put("data", records);
+    }
+
+    /**
+     * 发布问卷
+     */
+    @Operation(summary = "发布问卷", description = "将问卷状态修改为已发布")
+    @Parameter(name = "id", description = "问卷ID", required = true)
+    @PostMapping("/{id}/publish")
+    public R publishPaper(@PathVariable Integer id) {
+        ExamPaperEntity examPaper = examPaperService.getById(id);
+        if (examPaper == null) {
+            return R.error("问卷不存在");
+        }
+
+        // 设置问卷状态为已发布(1)
+        examPaper.setStatus(1);
+        boolean updated = examPaperService.updateById(examPaper);
+
+        return updated ? R.ok().put("data", examPaper) : R.error("发布失败");
+    }
+
+    /**
+     * 关闭问卷
+     */
+    @Operation(summary = "关闭问卷", description = "将问卷状态修改为已关闭")
+    @Parameter(name = "id", description = "问卷ID", required = true)
+    @PostMapping("/{id}/close")
+    public R closePaper(@PathVariable Integer id) {
+        ExamPaperEntity examPaper = examPaperService.getById(id);
+        if (examPaper == null) {
+            return R.error("问卷不存在");
+        }
+
+        // 设置问卷状态为已关闭(2)
+        examPaper.setStatus(2);
+        boolean updated = examPaperService.updateById(examPaper);
+
+        return updated ? R.ok().put("data", examPaper) : R.error("关闭失败");
     }
 }

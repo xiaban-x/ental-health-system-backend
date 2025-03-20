@@ -40,6 +40,12 @@ public class ExamPaperEntity implements Serializable {
 	private Integer status;
 
 	/**
+	 * 用户Id
+	 */
+	@TableField("user_id")
+	private Integer userId;
+
+	/**
 	 * 创建时间
 	 */
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
