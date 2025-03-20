@@ -17,6 +17,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import org.apache.commons.lang3.StringUtils;
+import java.util.Date;
 
 /**
  * 试题表 后端接口
@@ -75,10 +78,25 @@ public class ExamQuestionController {
     @Parameter(name = "examQuestion", description = "试题信息", required = true)
     @PostMapping
     public R createQuestion(@RequestBody ExamQuestionEntity examQuestion) {
-        // 使用雪花算法或其他更可靠的ID生成方式
-        examQuestion.setId((int) (new Date().getTime() + Math.floor(Math.random() * 1000)));
-        boolean saved = examQuestionService.save(examQuestion);
-        return saved ? R.ok().put("data", examQuestion) : R.error("创建失败");
+        // 检查必要字段
+        if (examQuestion == null || StringUtils.isBlank(examQuestion.getQuestionName())) {
+            return R.error("试题信息不能为空");
+        }
+
+        // 设置创建时间和更新时间
+        Date now = new Date();
+        examQuestion.setCreatedAt(now);
+        examQuestion.setUpdatedAt(now);
+
+        // 使用更可靠的ID生成方式
+        examQuestion.setId((int) IdWorker.getId());
+
+        try {
+            boolean saved = examQuestionService.save(examQuestion);
+            return saved ? R.ok().put("data", examQuestion) : R.error("创建失败");
+        } catch (Exception e) {
+            return R.error("创建试题失败：" + e.getMessage());
+        }
     }
 
     /**

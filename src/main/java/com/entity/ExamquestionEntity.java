@@ -26,7 +26,7 @@ public class ExamQuestionEntity implements Serializable {
 	/**
 	 * 主键id
 	 */
-	@TableId
+	@TableId(type = IdType.ASSIGN_ID)
 	private Integer id;
 	/**
 	 * 所属试卷id（外键）
