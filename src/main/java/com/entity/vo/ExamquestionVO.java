@@ -2,6 +2,8 @@ package com.entity.vo;
 
 import java.io.Serializable;
 
+import lombok.Data;
+
 /**
  * 试题表
  * 手机端接口返回实体辅助类
@@ -11,6 +13,7 @@ import java.io.Serializable;
  * @email
  * @date 2021-05-04 17:24:35
  */
+@Data
 public class ExamQuestionVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -61,125 +64,5 @@ public class ExamQuestionVO implements Serializable {
 	 */
 
 	private Integer sequence;
-
-	/**
-	 * 设置：试卷名称
-	 */
-
-	public void setPapername(String papername) {
-		this.papername = papername;
-	}
-
-	/**
-	 * 获取：试卷名称
-	 */
-	public String getPapername() {
-		return papername;
-	}
-
-	/**
-	 * 设置：试题名称
-	 */
-
-	public void setQuestionname(String questionname) {
-		this.questionname = questionname;
-	}
-
-	/**
-	 * 获取：试题名称
-	 */
-	public String getQuestionname() {
-		return questionname;
-	}
-
-	/**
-	 * 设置：选项，json字符串
-	 */
-
-	public void setOptions(String options) {
-		this.options = options;
-	}
-
-	/**
-	 * 获取：选项，json字符串
-	 */
-	public String getOptions() {
-		return options;
-	}
-
-	/**
-	 * 设置：分值
-	 */
-
-	public void setScore(Integer score) {
-		this.score = score;
-	}
-
-	/**
-	 * 获取：分值
-	 */
-	public Integer getScore() {
-		return score;
-	}
-
-	/**
-	 * 设置：正确答案
-	 */
-
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
-
-	/**
-	 * 获取：正确答案
-	 */
-	public String getAnswer() {
-		return answer;
-	}
-
-	/**
-	 * 设置：答案解析
-	 */
-
-	public void setAnalysis(String analysis) {
-		this.analysis = analysis;
-	}
-
-	/**
-	 * 获取：答案解析
-	 */
-	public String getAnalysis() {
-		return analysis;
-	}
-
-	/**
-	 * 设置：试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
-	 */
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
-	/**
-	 * 获取：试题类型，0：单选题 1：多选题 2：判断题 3：填空题（暂不考虑多项填空）
-	 */
-	public Integer getType() {
-		return type;
-	}
-
-	/**
-	 * 设置：试题排序，值越大排越前面
-	 */
-
-	public void setSequence(Integer sequence) {
-		this.sequence = sequence;
-	}
-
-	/**
-	 * 获取：试题排序，值越大排越前面
-	 */
-	public Integer getSequence() {
-		return sequence;
-	}
 
 }

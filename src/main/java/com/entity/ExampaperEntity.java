@@ -30,6 +30,11 @@ public class ExamPaperEntity implements Serializable {
 	private String title;
 
 	/**
+	 * 试卷描述
+	 */
+	private String description;
+
+	/**
 	 * 问卷时长(分钟)
 	 */
 	private Integer time;
