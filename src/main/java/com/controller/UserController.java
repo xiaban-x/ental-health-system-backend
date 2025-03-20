@@ -246,14 +246,124 @@ public class UserController {
      */
     @Operation(summary = "修改用户信息", description = "修改当前登录用户的基本信息")
     @PutMapping("/profile")
-    public R update(@RequestBody UserEntity user, HttpServletRequest request) {
+    @Transactional
+    public R update(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        user.setId(userId);
+        
+        // 获取当前用户信息
+        UserEntity user = userService.getById(userId);
+        if (user == null) {
+            return R.error("用户不存在");
+        }
+        
+        // 更新用户基本信息
+        if (params.get("name") != null) {
+            user.setName(params.get("name").toString());
+        }
+        if (params.get("sex") != null) {
+            user.setSex(params.get("sex").toString());
+        }
+        if (params.get("phone") != null) {
+            user.setPhone(params.get("phone").toString());
+        }
+        if (params.get("email") != null) {
+            user.setEmail(params.get("email").toString());
+        }
+        if (params.get("avatar") != null) {
+            user.setAvatar(params.get("avatar").toString());
+        }
+        
+        // 更新时间
+        user.setUpdatedAt(new Date());
+        
         // 不允许修改用户名和密码
         user.setUsername(null);
         user.setPassword(null);
+        
+        // 更新用户基本信息
         userService.updateById(user);
-        return R.ok();
+        
+        // 根据角色更新对应的角色信息
+        if ("student".equals(user.getRole())) {
+            StudentEntity student = studentService.getByUserId(userId);
+            if (student != null) {
+                if (params.get("studentId") != null) {
+                    student.setStudentId(params.get("studentId").toString());
+                }
+                if (params.get("major") != null) {
+                    student.setMajor(params.get("major").toString());
+                }
+                if (params.get("className") != null) {
+                    student.setClassName(params.get("className").toString());
+                }
+                if (params.get("grade") != null) {
+                    student.setGrade(params.get("grade").toString());
+                }
+                studentService.updateById(student);
+            }
+        } else if ("teacher".equals(user.getRole())) {
+            TeacherEntity teacher = teacherService.getByUserId(userId);
+            if (teacher != null) {
+                if (params.get("employeeId") != null) {
+                    teacher.setEmployeeId(params.get("employeeId").toString());
+                }
+                if (params.get("title") != null) {
+                    teacher.setTitle(params.get("title").toString());
+                }
+                if (params.get("department") != null) {
+                    teacher.setDepartment(params.get("department").toString());
+                }
+                if (params.get("researchField") != null) {
+                    teacher.setResearchField(params.get("researchField").toString());
+                }
+                teacherService.updateById(teacher);
+            }
+        } else if ("doctor".equals(user.getRole())) {
+            DoctorEntity doctor = doctorService.getByUserId(userId);
+            if (doctor != null) {
+                if (params.get("licenseNumber") != null) {
+                    doctor.setLicenseNumber(params.get("licenseNumber").toString());
+                }
+                if (params.get("title") != null) {
+                    doctor.setTitle(params.get("title").toString());
+                }
+                if (params.get("level") != null) {
+                    doctor.setLevel(params.get("level").toString());
+                }
+                if (params.get("specialty") != null) {
+                    doctor.setSpecialty(params.get("specialty").toString());
+                }
+                if (params.get("department") != null) {
+                    doctor.setDepartment(params.get("department").toString());
+                }
+                if (params.get("experienceYears") != null) {
+                    try {
+                        doctor.setExperienceYears(Integer.parseInt(params.get("experienceYears").toString()));
+                    } catch (NumberFormatException e) {
+                        // 忽略转换错误
+                    }
+                }
+                doctorService.updateById(doctor);
+            }
+        }
+        
+        // 获取更新后的用户和角色信息
+        UserEntity updatedUser = userService.getById(userId);
+        Object roleInfo = null;
+        if ("student".equals(user.getRole())) {
+            roleInfo = studentService.getByUserId(userId);
+        } else if ("teacher".equals(user.getRole())) {
+            roleInfo = teacherService.getByUserId(userId);
+        } else if ("doctor".equals(user.getRole())) {
+            roleInfo = doctorService.getByUserId(userId);
+        }
+        
+        // 创建包含user和roleInfo的Map作为data字段的值
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", updatedUser);
+        data.put("roleInfo", roleInfo);
+        
+        return R.ok().put("data", data);
     }
 
     /**
