@@ -9,9 +9,9 @@ server:
 spring:
     datasource:
         driverClassName: org.postgresql.Driver
-        url: jdbc:postgresql://123.207.83.138:15433/ental_health_system
+        url: jdbc:postgresql://127.0.0.1:5432/ental_health_system
         username: postgres
-        password: huangxi
+        password: 123456
     mvc:
         pathmatch:
             matching-strategy: ant_path_matcher
