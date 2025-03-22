@@ -2,7 +2,9 @@ package com.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -319,5 +321,49 @@ public class ExamPaperController {
         boolean updated = examPaperService.updateById(examPaper);
 
         return updated ? R.ok().put("data", examPaper) : R.error("关闭失败");
+    }
+
+    /**
+     * 交换问题顺序
+     */
+    @Operation(summary = "交换问题顺序", description = "交换两个问题的顺序")
+    @Parameter(name = "swapRequest", description = "交换顺序请求信息", required = true)
+    @PutMapping("/question/swap-sequence")
+    public R swapQuestionSequence(@RequestBody Map<String, Object> swapRequest) {
+        Integer questionId1 = (Integer) swapRequest.get("questionId1");
+        Integer sequence1 = (Integer) swapRequest.get("sequence1");
+        Integer questionId2 = (Integer) swapRequest.get("questionId2");
+        Integer sequence2 = (Integer) swapRequest.get("sequence2");
+
+        // 参数校验
+        if (questionId1 == null || questionId2 == null ||
+                sequence1 == null || sequence2 == null) {
+            return R.error("参数不完整");
+        }
+
+        // 获取两个问题
+        ExamQuestionEntity question1 = examQuestionService.getById(questionId1);
+        ExamQuestionEntity question2 = examQuestionService.getById(questionId2);
+
+        if (question1 == null || question2 == null) {
+            return R.error("问题不存在");
+        }
+
+        // 交换序号
+        question1.setSequence(sequence2);
+        question2.setSequence(sequence1);
+
+        // 批量更新
+        boolean success = examQuestionService.updateBatchById(Arrays.asList(question1, question2));
+
+        if (!success) {
+            return R.error("更新失败");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("question1", question1);
+        result.put("question2", question2);
+
+        return R.ok().put("data", result);
     }
 }
