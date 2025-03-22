@@ -324,7 +324,7 @@ public class ExamPaperController {
     }
 
     /**
-     * 交换问题顺序
+     * 交换问题顺序(传回来的序号已经是新的序号了)
      */
     @Operation(summary = "交换问题顺序", description = "交换两个问题的顺序")
     @Parameter(name = "swapRequest", description = "交换顺序请求信息", required = true)
@@ -350,8 +350,8 @@ public class ExamPaperController {
         }
 
         // 交换序号
-        question1.setSequence(sequence2);
-        question2.setSequence(sequence1);
+        question1.setSequence(sequence1);
+        question2.setSequence(sequence2);
 
         // 批量更新
         boolean success = examQuestionService.updateBatchById(Arrays.asList(question1, question2));
