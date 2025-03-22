@@ -88,6 +88,36 @@ public class ExamQuestionController {
         examQuestion.setCreatedAt(now);
         examQuestion.setUpdatedAt(now);
 
+        // 检查序号是否存在
+        if (examQuestion.getSequence() != null && examQuestion.getPaperId() != null) {
+            QueryWrapper<ExamQuestionEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("paper_id", examQuestion.getPaperId())
+                    .eq("sequence", examQuestion.getSequence());
+            
+            // 检查同一试卷下是否存在相同序号
+            if (examQuestionService.count(queryWrapper) > 0) {
+                // 获取当前试卷下的最大序号
+                queryWrapper.clear();
+                queryWrapper.eq("paper_id", examQuestion.getPaperId())
+                        .orderByDesc("sequence")
+                        .last("LIMIT 1");
+                
+                ExamQuestionEntity maxSequenceQuestion = examQuestionService.getOne(queryWrapper);
+                int newSequence = maxSequenceQuestion != null ? maxSequenceQuestion.getSequence() + 1 : 1;
+                examQuestion.setSequence(newSequence);
+            }
+        } else if (examQuestion.getPaperId() != null) {
+            // 如果未指定序号，自动设置为当前试卷最大序号+1
+            QueryWrapper<ExamQuestionEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("paper_id", examQuestion.getPaperId())
+                    .orderByDesc("sequence")
+                    .last("LIMIT 1");
+            
+            ExamQuestionEntity maxSequenceQuestion = examQuestionService.getOne(queryWrapper);
+            int newSequence = maxSequenceQuestion != null ? maxSequenceQuestion.getSequence() + 1 : 1;
+            examQuestion.setSequence(newSequence);
+        }
+
         // 使用更可靠的ID生成方式
         examQuestion.setId((int) IdWorker.getId());
 
