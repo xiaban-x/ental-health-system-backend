@@ -56,16 +56,16 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
         cal.add(Calendar.HOUR_OF_DAY, 1);
         if (tokenEntity != null) {
             tokenEntity.setToken(token);
-            tokenEntity.setExpiratedtime(cal.getTime());
+            tokenEntity.setExpiredAt(cal.getTime());
             this.updateById(tokenEntity);
         } else {
             TokenEntity newToken = new TokenEntity();
-            newToken.setUserid(userid);
+            newToken.setUserId(userid);
             newToken.setUsername(username);
-            newToken.setTablename(tableName);
+            newToken.setTableName(tableName);
             newToken.setRole(role);
             newToken.setToken(token);
-            newToken.setExpiratedtime(cal.getTime());
+            newToken.setExpiredAt(cal.getTime());
             this.save(newToken);
         }
         return token;
@@ -74,7 +74,7 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
     @Override
     public TokenEntity getTokenEntity(String token) {
         TokenEntity tokenEntity = this.getOne(new QueryWrapper<TokenEntity>().eq("token", token));
-        if (tokenEntity == null || tokenEntity.getExpiratedtime().getTime() < new Date().getTime()) {
+        if (tokenEntity == null || tokenEntity.getExpiredAt().getTime() < new Date().getTime()) {
             return null;
         }
         return tokenEntity;

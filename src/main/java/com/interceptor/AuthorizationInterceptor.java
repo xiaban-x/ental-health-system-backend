@@ -85,7 +85,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
 
         // 设置认证信息
-        request.setAttribute("userId", tokenEntity.getUserid());
+        request.setAttribute("userId", tokenEntity.getUserId());
         request.setAttribute("role", tokenEntity.getRole());
         request.setAttribute("username", tokenEntity.getUsername());
 

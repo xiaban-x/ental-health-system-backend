@@ -3,7 +3,10 @@ package com.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -21,7 +24,8 @@ public class TokenEntity implements Serializable {
 	/**
 	 * 用户id
 	 */
-	private Integer userid;
+	@TableField("user_id")
+	private Integer userId;
 
 	/**
 	 * 用户名
@@ -31,7 +35,8 @@ public class TokenEntity implements Serializable {
 	/**
 	 * 表名
 	 */
-	private String tablename;
+	@TableField("table_name")
+	private String tableName;
 
 	/**
 	 * 角色
@@ -46,11 +51,23 @@ public class TokenEntity implements Serializable {
 	/**
 	 * 过期时间
 	 */
-	private Date expiratedtime;
+	@TableField("expired_at")
+	private Date expiredAt;
 
 	/**
-	 * 新增时间
+	 * 创建时间
 	 */
-	private Date addtime;
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "created_at", fill = FieldFill.INSERT)
+	private Date createdAt;
+
+	/**
+	 * 更新时间
+	 */
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+	private Date updatedAt;
 
 }

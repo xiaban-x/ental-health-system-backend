@@ -252,7 +252,7 @@ public class ExamPaperController {
 
             ExamRecordEntity record = new ExamRecordEntity();
             // 设置用户信息(从token中获取)
-            record.setUserId(tokenEntity.getUserid());
+            record.setUserId(tokenEntity.getUserId());
             record.setUsername(tokenEntity.getUsername());
 
             record.setPaperId(paperId);
