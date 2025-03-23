@@ -1,19 +1,20 @@
 package com.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
- * 咨询时间段表
- * 数据库通用操作实体类（普通增删改查）
+ * 咨询时间段
  */
 @Data
-@NoArgsConstructor
 @TableName("time_slot")
 public class TimeSlotEntity implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -21,7 +22,7 @@ public class TimeSlotEntity implements Serializable {
     /**
      * 主键id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Integer id;
 
     /**
