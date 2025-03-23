@@ -188,7 +188,7 @@ public class ExamRecordController {
             queryWrapper.le(columnName, params.get("remindend"));
         }
         if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            queryWrapper.eq("userid", (Integer) request.getSession().getAttribute("userId"));
+            queryWrapper.eq("user_id", (Integer) request.getSession().getAttribute("userId"));
         }
 
         int count = (int) examRecordService.count(queryWrapper);
@@ -206,7 +206,7 @@ public class ExamRecordController {
         boolean removed = examRecordService.remove(
                 new QueryWrapper<ExamRecordEntity>()
                         .eq("paperid", paperId)
-                        .eq("userid", userId));
+                        .eq("user_id", userId));
         return removed ? R.ok() : R.error("删除失败");
     }
 }

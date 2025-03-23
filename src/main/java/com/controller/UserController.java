@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.annotation.IgnoreAuth;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.entity.DoctorEntity;
+import com.entity.CounselorEntity;
 import com.entity.StudentEntity;
-import com.entity.TeacherEntity;
 import com.entity.UserEntity;
-import com.service.DoctorService;
+import com.service.CounselorService;
 import com.service.StudentService;
-import com.service.TeacherService;
 import com.service.TokenService;
 import com.service.UserService;
 import com.utils.MD5Util;
@@ -46,10 +44,7 @@ public class UserController {
     private StudentService studentService;
 
     @Autowired
-    private TeacherService teacherService;
-
-    @Autowired
-    private DoctorService doctorService;
+    private CounselorService counselorService;
 
     /**
      * 用户注册
@@ -58,7 +53,7 @@ public class UserController {
     @Parameters({
             @Parameter(name = "username", description = "用户名", required = true),
             @Parameter(name = "password", description = "密码", required = true),
-            @Parameter(name = "role", description = "角色(student/teacher/doctor)", required = true)
+            @Parameter(name = "role", description = "角色(student/teacher)", required = true)
     })
     @IgnoreAuth
     @PostMapping("/register")
@@ -67,9 +62,9 @@ public class UserController {
         String username = params.get("username").toString();
         String password = params.get("password").toString();
         String role = params.get("role").toString();
-        System.out.println("paramas ===>" + params);
+
         // 验证角色是否有效
-        if (!role.equals("student") && !role.equals("teacher") && !role.equals("doctor")) {
+        if (!role.equals("student") && !role.equals("teacher")) {
             return R.error("无效的角色类型");
         }
 
@@ -82,67 +77,45 @@ public class UserController {
         // 创建用户
         UserEntity user = new UserEntity();
         user.setUsername(username);
-        user.setPassword(MD5Util.md5(password));
+        user.setPassword(password); // 实际应用中应该加密存储
         user.setRole(role);
-        user.setName(params.get("name") != null ? params.get("name").toString() : username);
+        userService.save(user);
 
-        // 设置创建和更新时间
-        Date now = new Date();
-        user.setCreatedAt(now);
-        user.setUpdatedAt(now);
-
-        if (params.get("sex") != null) {
-            user.setSex(params.get("sex").toString());
-        }
-        if (params.get("phone") != null) {
-            user.setPhone(params.get("phone").toString());
-        }
-        if (params.get("email") != null) {
-            user.setEmail(params.get("email").toString());
-        }
-        if (params.get("avatar") != null) {
-            user.setAvatar(params.get("avatar").toString());
-        }
-
-        // 使用MyBatis-Plus的saveOrUpdate方法可能会更好地处理ID生成
-        boolean saved = userService.saveOrUpdate(user);
-        if (!saved) {
-            return R.error("用户创建失败");
-        }
-
-        // 根据角色创建对应的角色信息
-        if ("student".equals(role)) {
+        // 根据角色创建对应的信息
+        if (role.equals("student")) {
             StudentEntity student = new StudentEntity();
             student.setUserId(user.getId());
-            student.setStudentId(params.get("studentId") != null ? params.get("studentId").toString() : "");
-            student.setMajor(params.get("major") != null ? params.get("major").toString() : "");
-            student.setClassName(params.get("className") != null ? params.get("className").toString() : "");
-            student.setGrade(params.get("grade") != null ? params.get("grade").toString() : "");
+            // 设置其他学生信息
             studentService.save(student);
-        } else if ("teacher".equals(role)) {
-            TeacherEntity teacher = new TeacherEntity();
-            teacher.setUserId(user.getId());
-            teacher.setEmployeeId(params.get("employeeId") != null ? params.get("employeeId").toString() : "");
-            teacher.setTitle(params.get("title") != null ? params.get("title").toString() : "");
-            teacher.setDepartment(params.get("department") != null ? params.get("department").toString() : "");
-            teacher.setResearchField(params.get("researchField") != null ? params.get("researchField").toString() : "");
-            teacherService.save(teacher);
-        } else if ("doctor".equals(role)) {
-            DoctorEntity doctor = new DoctorEntity();
-            doctor.setUserId(user.getId());
-            doctor.setLicenseNumber(params.get("licenseNumber") != null ? params.get("licenseNumber").toString() : "");
-            doctor.setTitle(params.get("title") != null ? params.get("title").toString() : "");
-            doctor.setLevel(params.get("level") != null ? params.get("level").toString() : "");
-            doctor.setSpecialty(params.get("specialty") != null ? params.get("specialty").toString() : "");
-            doctor.setDepartment(params.get("department") != null ? params.get("department").toString() : "");
-            if (params.get("experienceYears") != null) {
-                try {
-                    doctor.setExperienceYears(Integer.parseInt(params.get("experienceYears").toString()));
-                } catch (NumberFormatException e) {
-                    // 忽略转换错误
-                }
+        } else if (role.equals("teacher")) {
+            CounselorEntity counselor = new CounselorEntity();
+            counselor.setUserId(user.getId());
+
+            // 设置教师相关信息
+            if (params.containsKey("title")) {
+                counselor.setTitle(params.get("title").toString());
             }
-            doctorService.save(doctor);
+            if (params.containsKey("specialty")) {
+                counselor.setSpecialty(params.get("specialty").toString());
+            }
+            if (params.containsKey("introduction")) {
+                counselor.setIntroduction(params.get("introduction").toString());
+            }
+            if (params.containsKey("employeeId")) {
+                counselor.setEmployeeId(params.get("employeeId").toString());
+            }
+            if (params.containsKey("department")) {
+                counselor.setDepartment(params.get("department").toString());
+            }
+            if (params.containsKey("officeLocation")) {
+                counselor.setOfficeLocation(params.get("officeLocation").toString());
+            }
+
+            // 设置状态为可用
+            counselor.setStatus(1);
+
+            // 保存教师信息
+            counselorService.save(counselor);
         }
 
         return R.ok();
@@ -182,24 +155,22 @@ public class UserController {
                         "grade", student.getGrade());
             }
         } else if ("teacher".equals(user.getRole())) {
-            TeacherEntity teacher = teacherService.getByUserId(user.getId());
-            if (teacher != null) {
-                roleInfo = Map.of(
-                        "employeeId", teacher.getEmployeeId(),
-                        "title", teacher.getTitle(),
-                        "department", teacher.getDepartment(),
-                        "researchField", teacher.getResearchField());
-            }
-        } else if ("doctor".equals(user.getRole())) {
-            DoctorEntity doctor = doctorService.getByUserId(user.getId());
-            if (doctor != null) {
-                roleInfo = Map.of(
-                        "licenseNumber", doctor.getLicenseNumber(),
-                        "title", doctor.getTitle(),
-                        "level", doctor.getLevel(),
-                        "specialty", doctor.getSpecialty(),
-                        "department", doctor.getDepartment(),
-                        "experienceYears", doctor.getExperienceYears());
+            CounselorEntity counselor = counselorService.getByUserId(user.getId());
+            if (counselor != null) {
+                // 创建一个可变的Map
+                Map<String, Object> teacherInfo = new HashMap<>();
+
+                // 添加教师信息
+                teacherInfo.put("id", counselor.getId());
+                teacherInfo.put("title", counselor.getTitle());
+                teacherInfo.put("specialty", counselor.getSpecialty());
+                teacherInfo.put("introduction", counselor.getIntroduction());
+                teacherInfo.put("employeeId", counselor.getEmployeeId());
+                teacherInfo.put("department", counselor.getDepartment());
+                teacherInfo.put("officeLocation", counselor.getOfficeLocation());
+                teacherInfo.put("status", counselor.getStatus());
+
+                roleInfo = teacherInfo;
             }
         }
 
@@ -228,9 +199,7 @@ public class UserController {
         if ("student".equals(user.getRole())) {
             roleInfo = studentService.getByUserId(userId);
         } else if ("teacher".equals(user.getRole())) {
-            roleInfo = teacherService.getByUserId(userId);
-        } else if ("doctor".equals(user.getRole())) {
-            roleInfo = doctorService.getByUserId(userId);
+            roleInfo = counselorService.getByUserId(userId);
         }
 
         // 创建包含user和roleInfo的Map作为data字段的值
@@ -249,13 +218,13 @@ public class UserController {
     @Transactional
     public R update(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        
+
         // 获取当前用户信息
         UserEntity user = userService.getById(userId);
         if (user == null) {
             return R.error("用户不存在");
         }
-        
+
         // 更新用户基本信息
         if (params.get("name") != null) {
             user.setName(params.get("name").toString());
@@ -272,17 +241,17 @@ public class UserController {
         if (params.get("avatar") != null) {
             user.setAvatar(params.get("avatar").toString());
         }
-        
+
         // 更新时间
         user.setUpdatedAt(new Date());
-        
+
         // 不允许修改用户名和密码
         user.setUsername(null);
         user.setPassword(null);
-        
+
         // 更新用户基本信息
         userService.updateById(user);
-        
+
         // 根据角色更新对应的角色信息
         if ("student".equals(user.getRole())) {
             StudentEntity student = studentService.getByUserId(userId);
@@ -302,67 +271,46 @@ public class UserController {
                 studentService.updateById(student);
             }
         } else if ("teacher".equals(user.getRole())) {
-            TeacherEntity teacher = teacherService.getByUserId(userId);
-            if (teacher != null) {
-                if (params.get("employeeId") != null) {
-                    teacher.setEmployeeId(params.get("employeeId").toString());
-                }
+            CounselorEntity counselor = counselorService.getByUserId(userId);
+            if (counselor != null) {
+                // 更新教师信息
                 if (params.get("title") != null) {
-                    teacher.setTitle(params.get("title").toString());
-                }
-                if (params.get("department") != null) {
-                    teacher.setDepartment(params.get("department").toString());
-                }
-                if (params.get("researchField") != null) {
-                    teacher.setResearchField(params.get("researchField").toString());
-                }
-                teacherService.updateById(teacher);
-            }
-        } else if ("doctor".equals(user.getRole())) {
-            DoctorEntity doctor = doctorService.getByUserId(userId);
-            if (doctor != null) {
-                if (params.get("licenseNumber") != null) {
-                    doctor.setLicenseNumber(params.get("licenseNumber").toString());
-                }
-                if (params.get("title") != null) {
-                    doctor.setTitle(params.get("title").toString());
-                }
-                if (params.get("level") != null) {
-                    doctor.setLevel(params.get("level").toString());
+                    counselor.setTitle(params.get("title").toString());
                 }
                 if (params.get("specialty") != null) {
-                    doctor.setSpecialty(params.get("specialty").toString());
+                    counselor.setSpecialty(params.get("specialty").toString());
+                }
+                if (params.get("introduction") != null) {
+                    counselor.setIntroduction(params.get("introduction").toString());
+                }
+                if (params.get("employeeId") != null) {
+                    counselor.setEmployeeId(params.get("employeeId").toString());
                 }
                 if (params.get("department") != null) {
-                    doctor.setDepartment(params.get("department").toString());
+                    counselor.setDepartment(params.get("department").toString());
                 }
-                if (params.get("experienceYears") != null) {
-                    try {
-                        doctor.setExperienceYears(Integer.parseInt(params.get("experienceYears").toString()));
-                    } catch (NumberFormatException e) {
-                        // 忽略转换错误
-                    }
+                if (params.get("officeLocation") != null) {
+                    counselor.setOfficeLocation(params.get("officeLocation").toString());
                 }
-                doctorService.updateById(doctor);
+
+                counselorService.updateById(counselor);
             }
         }
-        
+
         // 获取更新后的用户和角色信息
         UserEntity updatedUser = userService.getById(userId);
         Object roleInfo = null;
         if ("student".equals(user.getRole())) {
             roleInfo = studentService.getByUserId(userId);
         } else if ("teacher".equals(user.getRole())) {
-            roleInfo = teacherService.getByUserId(userId);
-        } else if ("doctor".equals(user.getRole())) {
-            roleInfo = doctorService.getByUserId(userId);
+            roleInfo = counselorService.getByUserId(userId);
         }
-        
+
         // 创建包含user和roleInfo的Map作为data字段的值
         Map<String, Object> data = new HashMap<>();
         data.put("user", updatedUser);
         data.put("roleInfo", roleInfo);
-        
+
         return R.ok().put("data", data);
     }
 

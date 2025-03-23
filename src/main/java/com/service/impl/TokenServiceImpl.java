@@ -46,9 +46,9 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
     }
 
     @Override
-    public String generateToken(Integer userid, String username, String tableName, String role) {
+    public String generateToken(Integer userId, String username, String tableName, String role) {
         TokenEntity tokenEntity = this.getOne(new QueryWrapper<TokenEntity>()
-                .eq("userid", userid)
+                .eq("user_id", userId)
                 .eq("role", role));
         String token = CommonUtil.getRandomString(32);
         Calendar cal = Calendar.getInstance();
@@ -60,7 +60,7 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
             this.updateById(tokenEntity);
         } else {
             TokenEntity newToken = new TokenEntity();
-            newToken.setUserId(userid);
+            newToken.setUserId(userId);
             newToken.setUsername(username);
             newToken.setTableName(tableName);
             newToken.setRole(role);

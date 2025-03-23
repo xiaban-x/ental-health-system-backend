@@ -91,7 +91,7 @@ public class AppointmentController {
         // 获取咨询师姓名
         CounselorEntity counselor = counselorService.getById(counselorId);
         if (counselor != null) {
-            appointment.setCounselorName(counselor.getName());
+            appointment.setCounselorName(user.getName());
         }
         appointment.setTimeSlotId(timeSlotId);
         appointment.setStartTime(timeSlot.getStartTime());

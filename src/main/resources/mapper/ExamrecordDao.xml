@@ -5,7 +5,7 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
 	<resultMap type="com.entity.ExamRecordEntity" id="examrecordMap">
-		<result property="userid" column="userid" />
+		<result property="user_id" column="userId" />
 		<result property="username" column="username" />
 		<result property="paperid" column="paperid" />
 		<result property="papername" column="papername" />

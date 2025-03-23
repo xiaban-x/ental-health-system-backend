@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 咨询师表
+ * 咨询师/教师表
  * 数据库通用操作实体类（普通增删改查）
  */
 @Data
@@ -25,9 +25,10 @@ public class CounselorEntity implements Serializable {
     private Integer id;
 
     /**
-     * 咨询师姓名
+     * 用户id
      */
-    private String name;
+    @TableField("user_id")
+    private Integer userId;
 
     /**
      * 职称
@@ -45,14 +46,26 @@ public class CounselorEntity implements Serializable {
     private String introduction;
 
     /**
-     * 头像
-     */
-    private String avatar;
-
-    /**
      * 状态 0-不可用 1-可用
      */
     private Integer status;
+
+    /**
+     * 工号
+     */
+    @TableField("employee_id")
+    private String employeeId;
+
+    /**
+     * 所属院系
+     */
+    private String department;
+
+    /**
+     * 办公室位置
+     */
+    @TableField("office_location")
+    private String officeLocation;
 
     /**
      * 创建时间
