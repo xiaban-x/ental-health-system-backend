@@ -166,7 +166,7 @@ public class AppointmentController {
         // 更新时间段状态
         TimeSlotEntity timeSlot = timeSlotService.getById(appointment.getTimeSlotId());
         if (timeSlot != null) {
-            timeSlot.setStatus("available");
+            timeSlot.setStatus("pending");
             timeSlotService.updateById(timeSlot);
         }
 
@@ -210,7 +210,7 @@ public class AppointmentController {
         }
 
         // 检查预约状态是否为待审核
-        if (!"available".equals(appointment.getStatus())) {
+        if (!"pending".equals(appointment.getStatus())) {
             return R.error("该预约已被审核或已取消，无法再次审核");
         }
 
@@ -232,7 +232,7 @@ public class AppointmentController {
         if ("rejected".equals(status)) {
             TimeSlotEntity timeSlot = timeSlotService.getById(appointment.getTimeSlotId());
             if (timeSlot != null) {
-                timeSlot.setStatus("available");
+                timeSlot.setStatus("pending");
                 timeSlotService.updateById(timeSlot);
             }
         }
