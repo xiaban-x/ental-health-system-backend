@@ -70,7 +70,7 @@ public class AppointmentEntity implements Serializable {
     private Date endTime;
 
     /**
-     * 状态 pending-待确认 confirmed-已确认 completed-已完成 cancelled-已取消
+     * 状态 available-待确认 confirmed-可预约 booked-已预约 completed-已完成 canceled-已取消
      */
     private String status;
 

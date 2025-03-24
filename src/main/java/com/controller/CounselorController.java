@@ -22,8 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,11 +56,39 @@ public class CounselorController {
     @GetMapping("/list")
     public R list() {
         QueryWrapper<CounselorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", 1); // 只获取状态为可用的咨询师
-        queryWrapper.in("role_type", Arrays.asList(1, 3)); // 获取咨询师或兼职角色
+        queryWrapper.eq("status", 1);
         queryWrapper.orderByAsc("id");
-        List<CounselorEntity> list = counselorService.list(queryWrapper);
-        return R.ok().put("data", list);
+        List<CounselorEntity> counselorList = counselorService.list(queryWrapper);
+
+        // 创建结果列表，用于存储合并后的数据
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        // 遍历咨询师列表，获取对应的用户信息并合并
+        for (CounselorEntity counselor : counselorList) {
+            // 获取用户信息
+            UserEntity user = userService.getById(counselor.getUserId());
+            if (user != null) {
+                // 创建合并后的数据Map
+                Map<String, Object> resultMap = new HashMap<>();
+                // 添加咨询师信息
+                resultMap.put("id", counselor.getId());
+                resultMap.put("userId", counselor.getUserId());
+                resultMap.put("title", counselor.getTitle());
+                resultMap.put("specialty", counselor.getSpecialty());
+                resultMap.put("introduction", counselor.getIntroduction());
+                resultMap.put("status", counselor.getStatus());
+                // 添加用户信息
+                resultMap.put("username", user.getUsername());
+                resultMap.put("name", user.getName());
+                resultMap.put("phone", user.getPhone());
+                resultMap.put("email", user.getEmail());
+                resultMap.put("avatar", user.getAvatar());
+
+                resultList.add(resultMap);
+            }
+        }
+
+        return R.ok().put("data", resultList);
     }
 
     /**
