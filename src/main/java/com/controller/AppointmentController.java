@@ -172,4 +172,98 @@ public class AppointmentController {
 
         return R.ok();
     }
+
+    /**
+     * 咨询师审核预约
+     */
+    @Operation(summary = "审核预约", description = "咨询师审核预约申请")
+    @Parameters({
+            @Parameter(name = "id", description = "预约ID", required = true),
+            @Parameter(name = "status", description = "预约状态(approved/rejected)", required = true),
+            @Parameter(name = "comment", description = "审核意见", required = false)
+    })
+    @PostMapping("/{id}/review")
+    @Transactional
+    public R reviewAppointment(@PathVariable("id") Integer id, @RequestBody Map<String, String> params,
+            HttpServletRequest request) {
+        // 从token中获取用户信息
+        Integer userId = (Integer) request.getAttribute("userId");
+
+        // 检查用户是否是咨询师
+        QueryWrapper<CounselorEntity> counselorQuery = new QueryWrapper<>();
+        counselorQuery.eq("user_id", userId);
+        CounselorEntity counselor = counselorService.getOne(counselorQuery);
+
+        if (counselor == null) {
+            return R.error("您不是咨询师，无权审核预约");
+        }
+
+        // 获取预约记录
+        AppointmentEntity appointment = appointmentService.getById(id);
+        if (appointment == null) {
+            return R.error("预约不存在");
+        }
+
+        // 检查是否是分配给该咨询师的预约
+        if (!counselor.getId().equals(appointment.getCounselorId())) {
+            return R.error("您无权审核此预约");
+        }
+
+        // 检查预约状态是否为待审核
+        if (!"available".equals(appointment.getStatus())) {
+            return R.error("该预约已被审核或已取消，无法再次审核");
+        }
+
+        // 获取审核结果
+        String status = params.get("status");
+        if (status == null || (!status.equals("approved") && !status.equals("rejected"))) {
+            return R.error("无效的审核状态，必须为approved或rejected");
+        }
+
+        // 获取审核意见
+        String notes = params.get("notes");
+
+        // 更新预约状态
+        appointment.setStatus(status);
+        appointment.setNotes(notes);
+        appointmentService.updateById(appointment);
+
+        // 如果拒绝预约，将时间段状态改回可用
+        if ("rejected".equals(status)) {
+            TimeSlotEntity timeSlot = timeSlotService.getById(appointment.getTimeSlotId());
+            if (timeSlot != null) {
+                timeSlot.setStatus("available");
+                timeSlotService.updateById(timeSlot);
+            }
+        }
+
+        return R.ok();
+    }
+
+    /**
+     * 获取咨询师的预约列表
+     */
+    @Operation(summary = "获取咨询师预约列表", description = "获取当前咨询师的所有预约记录")
+    @GetMapping("/counselor-appointments")
+    public R counselorAppointments(HttpServletRequest request) {
+        // 从token中获取用户信息
+        Integer userId = (Integer) request.getAttribute("userId");
+
+        // 检查用户是否是咨询师
+        QueryWrapper<CounselorEntity> counselorQuery = new QueryWrapper<>();
+        counselorQuery.eq("user_id", userId);
+        CounselorEntity counselor = counselorService.getOne(counselorQuery);
+
+        if (counselor == null) {
+            return R.error("您不是咨询师");
+        }
+
+        // 查询该咨询师的所有预约
+        QueryWrapper<AppointmentEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("counselor_id", counselor.getId());
+        queryWrapper.orderByDesc("created_at");
+        List<AppointmentEntity> list = appointmentService.list(queryWrapper);
+
+        return R.ok().put("data", list);
+    }
 }
