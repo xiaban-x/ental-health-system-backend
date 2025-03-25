@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.ExamRecordEntity;
-
+import com.entity.UserEntity;
+import com.entity.ExamPaperEntity;
 import com.service.ExamRecordService;
+import com.service.UserService;
+import com.service.ExamPaperService;
 import com.utils.PageUtils;
 import com.utils.R;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,6 +48,12 @@ public class ExamRecordController {
     @Autowired
     private ExamRecordService examRecordService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ExamPaperService examPaperService;
+
     /**
      * 分页查询考试记录
      */
@@ -56,24 +68,61 @@ public class ExamRecordController {
     public R getExamRecords(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(required = false) Boolean groupBy,
-            ExamRecordEntity examRecord,
             HttpServletRequest request) {
-
-        if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            examRecord.setUserId((Integer) request.getSession().getAttribute("userId"));
+        Integer userId = (Integer) request.getAttribute("userId");
+        if (userId == null) {
+            return R.error("用户未登录");
         }
 
         QueryWrapper<ExamRecordEntity> queryWrapper = new QueryWrapper<>();
-        PageUtils pageResult;
+        // 添加用户ID条件
+        queryWrapper.eq("user_id", userId);
 
-        if (Boolean.TRUE.equals(groupBy)) {
-            pageResult = examRecordService.queryPageGroupBy(Map.of("page", page, "limit", size), queryWrapper);
-        } else {
-            pageResult = examRecordService.queryPage(Map.of("page", page, "limit", size), queryWrapper);
+        // 按创建时间降序排序
+        queryWrapper.orderByDesc("created_at");
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", page);
+        params.put("limit", size);
+        PageUtils pageResult = examRecordService.queryPage(
+                params,
+                queryWrapper);
+
+        try {
+            // 获取记录列表
+            // List<ExamRecordEntity> recordList = PageUtils.convert(pageResult);
+            List<Map<String, Object>> resultList = new ArrayList<>();
+
+            // 遍历记录，添加用户名和试卷名称
+            for (Object recordObj : pageResult.getList()) {
+                ExamRecordEntity record = (ExamRecordEntity) recordObj;
+                Map<String, Object> map = new HashMap<>();
+                map.put("record", record);
+
+                // 获取用户信息
+                if (record.getUserId() != null) {
+                    UserEntity user = userService.getById(record.getUserId());
+                    if (user != null) {
+                        map.put("username", user.getUsername());
+                    }
+                }
+
+                // 获取试卷信息
+                if (record.getPaperId() != null) {
+                    ExamPaperEntity paper = examPaperService.getById(record.getPaperId());
+                    if (paper != null) {
+                        map.put("paperName", paper.getTitle());
+                        map.put("description", paper.getDescription());
+                    }
+                }
+
+                resultList.add(map);
+            }
+            pageResult.setList(resultList);
+            return R.ok().put("data", pageResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error("查询失败：" + e.getMessage());
         }
-
-        return R.ok().put("data", pageResult);
     }
 
     /**
@@ -187,8 +236,19 @@ public class ExamRecordController {
         if (params.get("remindend") != null) {
             queryWrapper.le(columnName, params.get("remindend"));
         }
-        if (!request.getSession().getAttribute("role").toString().equals("管理员")) {
-            queryWrapper.eq("user_id", (Integer) request.getSession().getAttribute("userId"));
+
+        // 检查session中的role属性是否存在
+        Object roleObj = request.getSession().getAttribute("role");
+        String role = roleObj != null ? roleObj.toString() : "";
+
+        if (!"管理员".equals(role)) {
+            // 检查userId是否存在
+            Object userIdObj = request.getSession().getAttribute("userId");
+            if (userIdObj != null) {
+                queryWrapper.eq("user_id", (Integer) userIdObj);
+            } else {
+                return R.error("未登录或会话已过期");
+            }
         }
 
         int count = (int) examRecordService.count(queryWrapper);
@@ -205,7 +265,7 @@ public class ExamRecordController {
             @PathVariable("paperId") Integer paperId) {
         boolean removed = examRecordService.remove(
                 new QueryWrapper<ExamRecordEntity>()
-                        .eq("paperid", paperId)
+                        .eq("paper_id", paperId)
                         .eq("user_id", userId));
         return removed ? R.ok() : R.error("删除失败");
     }
