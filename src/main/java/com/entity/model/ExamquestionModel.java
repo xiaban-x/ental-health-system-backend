@@ -19,13 +19,13 @@ public class ExamQuestionModel implements Serializable {
 	 * 试卷名称
 	 */
 
-	private String papername;
+	private String paper_name;
 
 	/**
 	 * 试题名称
 	 */
 
-	private String questionname;
+	private String questionName;
 
 	/**
 	 * 选项，json字符串
@@ -67,30 +67,30 @@ public class ExamQuestionModel implements Serializable {
 	 * 设置：试卷名称
 	 */
 
-	public void setPapername(String papername) {
-		this.papername = papername;
+	public void setPapername(String paper_name) {
+		this.paper_name = paper_name;
 	}
 
 	/**
 	 * 获取：试卷名称
 	 */
 	public String getPapername() {
-		return papername;
+		return paper_name;
 	}
 
 	/**
 	 * 设置：试题名称
 	 */
 
-	public void setQuestionname(String questionname) {
-		this.questionname = questionname;
+	public void setQuestionname(String questionName) {
+		this.questionName = questionName;
 	}
 
 	/**
 	 * 获取：试题名称
 	 */
 	public String getQuestionname() {
-		return questionname;
+		return questionName;
 	}
 
 	/**

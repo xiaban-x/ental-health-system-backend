@@ -35,70 +35,21 @@ public class ExamRecordEntity implements Serializable {
 	private Integer userId;
 
 	/**
-	 * 用户名
-	 */
-
-	private String username;
-
-	/**
 	 * 试卷id（外键）
 	 */
 	@TableField("paper_id")
 	private Integer paperId;
 
 	/**
-	 * 试卷名称
-	 */
-	@TableField("paper_name")
-	private String paperName;
-
-	/**
-	 * 试题id（外键）
-	 */
-	@TableField("question_id")
-	private Integer questionId;
-
-	/**
-	 * 试题名称
-	 */
-	@TableField("question_name")
-	private String questionName;
-
-	/**
-	 * 选项，json字符串
-	 */
-
-	private String options;
-
-	/**
-	 * 分值
-	 */
-
-	private Integer score;
-
-	/**
-	 * 正确答案
-	 */
-
-	private String answer;
-
-	/**
-	 * 答案解析
-	 */
-
-	private String analysis;
-
-	/**
 	 * 试题得分
 	 */
-	@TableField("user_score")
-	private Integer userScore;
+	@TableField("total_score")
+	private Integer totalScore;
 
 	/**
-	 * 考生答案
+	 * 试卷反馈
 	 */
-	@TableField("user_answer")
-	private String userAnswer;
+	private String feedback;
 
 	/**
 	 * 创建时间

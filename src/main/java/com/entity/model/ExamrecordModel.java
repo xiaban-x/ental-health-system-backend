@@ -25,25 +25,25 @@ public class ExamRecordModel implements Serializable {
 	 * 试卷id（外键）
 	 */
 
-	private Integer paperid;
+	private Integer paper_id;
 
 	/**
 	 * 试卷名称
 	 */
 
-	private String papername;
+	private String paper_name;
 
 	/**
 	 * 试题id（外键）
 	 */
 
-	private Integer questionid;
+	private Integer question_id;
 
 	/**
 	 * 试题名称
 	 */
 
-	private String questionname;
+	private String questionName;
 
 	/**
 	 * 选项，json字符串
@@ -73,13 +73,13 @@ public class ExamRecordModel implements Serializable {
 	 * 试题得分
 	 */
 
-	private Integer myscore;
+	private Integer total_score;
 
 	/**
 	 * 考生答案
 	 */
 
-	private String myanswer;
+	private String feedback;
 
 	/**
 	 * 设置：用户名
@@ -100,60 +100,60 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：试卷id（外键）
 	 */
 
-	public void setPaperid(Integer paperid) {
-		this.paperid = paperid;
+	public void setPaperid(Integer paper_id) {
+		this.paper_id = paper_id;
 	}
 
 	/**
 	 * 获取：试卷id（外键）
 	 */
 	public Integer getPaperid() {
-		return paperid;
+		return paper_id;
 	}
 
 	/**
 	 * 设置：试卷名称
 	 */
 
-	public void setPapername(String papername) {
-		this.papername = papername;
+	public void setPapername(String paper_name) {
+		this.paper_name = paper_name;
 	}
 
 	/**
 	 * 获取：试卷名称
 	 */
 	public String getPapername() {
-		return papername;
+		return paper_name;
 	}
 
 	/**
 	 * 设置：试题id（外键）
 	 */
 
-	public void setQuestionid(Integer questionid) {
-		this.questionid = questionid;
+	public void setQuestionid(Integer question_id) {
+		this.question_id = question_id;
 	}
 
 	/**
 	 * 获取：试题id（外键）
 	 */
 	public Integer getQuestionid() {
-		return questionid;
+		return question_id;
 	}
 
 	/**
 	 * 设置：试题名称
 	 */
 
-	public void setQuestionname(String questionname) {
-		this.questionname = questionname;
+	public void setQuestionname(String questionName) {
+		this.questionName = questionName;
 	}
 
 	/**
 	 * 获取：试题名称
 	 */
 	public String getQuestionname() {
-		return questionname;
+		return questionName;
 	}
 
 	/**
@@ -220,30 +220,30 @@ public class ExamRecordModel implements Serializable {
 	 * 设置：试题得分
 	 */
 
-	public void setMyscore(Integer myscore) {
-		this.myscore = myscore;
+	public void setMyscore(Integer total_score) {
+		this.total_score = total_score;
 	}
 
 	/**
 	 * 获取：试题得分
 	 */
 	public Integer getMyscore() {
-		return myscore;
+		return total_score;
 	}
 
 	/**
 	 * 设置：考生答案
 	 */
 
-	public void setMyanswer(String myanswer) {
-		this.myanswer = myanswer;
+	public void setMyanswer(String feedback) {
+		this.feedback = feedback;
 	}
 
 	/**
 	 * 获取：考生答案
 	 */
 	public String getMyanswer() {
-		return myanswer;
+		return feedback;
 	}
 
 }

@@ -76,12 +76,12 @@ public class ExamRecordVO implements Serializable {
 	/**
 	 * 试题得分
 	 */
-	@TableField(value = "user_score")
+	@TableField(value = "total_score")
 	private Integer userScore;
 
 	/**
 	 * 考生答案
 	 */
-	@TableField(value = "user_answer")
+	@TableField(value = "feedback")
 	private String userAnswer;
 }

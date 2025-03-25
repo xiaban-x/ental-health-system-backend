@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
  * @email
  * @date 2021-05-04 17:24:35
  */
-@TableName("examrecord")
+@TableName("exam_record")
 public class ExamRecordView extends ExamRecordEntity {
 	private static final long serialVersionUID = 1L;
 

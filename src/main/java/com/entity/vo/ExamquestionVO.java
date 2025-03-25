@@ -21,13 +21,13 @@ public class ExamQuestionVO implements Serializable {
 	 * 试卷名称
 	 */
 
-	private String papername;
+	private String paperName;
 
 	/**
 	 * 试题名称
 	 */
 
-	private String questionname;
+	private String questionName;
 
 	/**
 	 * 选项，json字符串

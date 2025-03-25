@@ -5,9 +5,9 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
 	<resultMap type="com.entity.ExamQuestionEntity" id="examquestionMap">
-		<result property="paperid" column="paperid" />
-		<result property="papername" column="papername" />
-		<result property="questionname" column="questionname" />
+		<result property="paper_id" column="paper_id" />
+		<result property="paper_name" column="paper_name" />
+		<result property="questionName" column="questionName" />
 		<result property="options" column="options" />
 		<result property="score" column="score" />
 		<result property="answer" column="answer" />
