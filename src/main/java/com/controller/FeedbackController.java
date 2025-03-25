@@ -1,7 +1,9 @@
 package com.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.entity.FeedbackEntity;
+import com.entity.UserEntity;
 import com.service.FeedbackService;
 import com.service.UserService;
 import com.utils.PageUtils;
@@ -47,6 +50,28 @@ public class FeedbackController {
     @GetMapping("/page")
     public R page(@RequestParam Map<String, Object> params) {
         PageUtils page = feedbackService.queryPage(params);
+
+        // 获取反馈列表
+        List<FeedbackEntity> feedbackList = (List<FeedbackEntity>) page.getList();
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        // 遍历反馈列表，添加用户信息
+        for (FeedbackEntity feedback : feedbackList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("feedback", feedback);
+
+            // 获取用户信息
+            UserEntity user = userService.getById(feedback.getUserId());
+            if (user != null) {
+                map.put("user", user);
+            }
+
+            resultList.add(map);
+        }
+
+        // 替换原有列表
+        page.setList(resultList);
+
         return R.ok().put("data", page);
     }
 
