@@ -239,50 +239,61 @@ public class ExamPaperController {
             return R.error("试卷不存在");
         }
 
-        // 批量保存答案记录
-        List<ExamRecordEntity> records = new ArrayList<>();
-
-        // 修改遍历方式
+        // 计算总分
+        int totalScore = 0;
+        
+        // 遍历答案计算得分
         for (AnswerSubmitDTO.Answer answer : submitDTO.getAnswers()) {
             // 获取题目信息
             ExamQuestionEntity question = examQuestionService.getById(answer.getQuestionId());
             if (question == null) {
                 continue;
             }
-
-            ExamRecordEntity record = new ExamRecordEntity();
-            // 设置用户信息(从token中获取)
-            record.setUserId(tokenEntity.getUserId());
-            record.setUsername(tokenEntity.getUsername());
-
-            record.setPaperId(paperId);
-            record.setPaperName(paper.getTitle());
-            record.setQuestionId(answer.getQuestionId());
-            record.setQuestionName(question.getQuestionName());
-            record.setOptions(question.getOptions());
-            record.setScore(question.getScore());
-            record.setAnswer(question.getAnswer());
-            record.setAnalysis(question.getAnalysis());
-            record.setUserAnswer(answer.getOptionValue());
-
+            
             // 判断答案是否正确并计算得分
             if (answer.getOptionValue().equals(question.getAnswer())) {
-                record.setUserScore(question.getScore());
-            } else {
-                record.setUserScore(0);
+                totalScore += question.getScore();
             }
-
-            records.add(record);
         }
-
-        // 批量保存记录
-        boolean success = examRecordService.saveBatch(records);
+        
+        // 创建考试记录
+        ExamRecordEntity record = new ExamRecordEntity();
+        record.setUserId(tokenEntity.getUserId());
+        record.setPaperId(paperId);
+        record.setTotalScore(totalScore);
+        
+        // 根据得分生成反馈
+        String feedback = generateFeedback(totalScore, paper);
+        record.setFeedback(feedback);
+        
+        // 保存记录
+        boolean success = examRecordService.save(record);
 
         if (!success) {
             return R.error("提交答案失败");
         }
 
-        return R.ok().put("data", records);
+        return R.ok().put("data", record);
+    }
+    
+    /**
+     * 根据得分生成反馈
+     * @param totalScore 总分
+     * @param paper 试卷信息
+     * @return 反馈内容
+     */
+    private String generateFeedback(int totalScore, ExamPaperEntity paper) {
+        // 这里可以根据试卷类型和得分情况生成不同的反馈
+        // 例如心理测试可能有不同的结果解释
+        
+        // 简单示例
+        if (totalScore >= 80) {
+            return "优秀：您的表现非常出色！";
+        } else if (totalScore >= 60) {
+            return "良好：您的表现不错，还有提升空间。";
+        } else {
+            return "需要改进：建议您重新学习相关内容。";
+        }
     }
 
     /**
