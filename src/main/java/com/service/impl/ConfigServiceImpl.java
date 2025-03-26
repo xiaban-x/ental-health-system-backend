@@ -17,11 +17,18 @@ import com.utils.PageUtils;
 public class ConfigServiceImpl extends ServiceImpl<ConfigDao, ConfigEntity> implements ConfigService {
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        IPage<ConfigEntity> page = this.page(
-                new Page<ConfigEntity>(
-                        params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
-                        params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10),
-                new QueryWrapper<ConfigEntity>());
-        return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+        // 创建查询条件
+        QueryWrapper<ConfigEntity> queryWrapper = new QueryWrapper<>();
+        
+        // 创建分页对象
+        Page<ConfigEntity> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        
+        // 使用page方法进行分页查询
+        IPage<ConfigEntity> iPage = this.page(page, queryWrapper);
+        
+        // 返回分页结果
+        return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
     }
 }

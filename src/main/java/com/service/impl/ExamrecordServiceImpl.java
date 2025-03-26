@@ -28,10 +28,15 @@ public class ExamRecordServiceImpl extends ServiceImpl<ExamRecordDao, ExamRecord
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params, QueryWrapper<ExamRecordEntity> wrapper) {
+		// 创建分页对象
 		Page<ExamRecordEntity> page = new Page<>(
 				params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
 				params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
-		page.setRecords(baseMapper.selectList(wrapper));
-		return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+		
+		// 使用page方法进行分页查询，这样会在SQL中添加LIMIT子句
+		IPage<ExamRecordEntity> iPage = this.page(page, wrapper);
+		
+		// 返回分页结果
+		return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
 	}
 }

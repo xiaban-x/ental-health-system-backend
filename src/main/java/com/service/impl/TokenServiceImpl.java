@@ -23,26 +23,38 @@ public class TokenServiceImpl extends ServiceImpl<TokenDao, TokenEntity> impleme
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        IPage<TokenEntity> page = this.page(
-                new Page<TokenEntity>(
-                        params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
-                        params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10),
-                new QueryWrapper<TokenEntity>());
-        return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+        // 创建查询条件
+        QueryWrapper<TokenEntity> queryWrapper = new QueryWrapper<>();
+        
+        // 创建分页对象
+        Page<TokenEntity> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        
+        // 使用page方法进行分页查询
+        IPage<TokenEntity> iPage = this.page(page, queryWrapper);
+        
+        // 返回分页结果
+        return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
+    }
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params, QueryWrapper<TokenEntity> wrapper) {
+        // 创建分页对象
+        Page<TokenEntity> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        
+        // 使用page方法进行分页查询
+        IPage<TokenEntity> iPage = this.page(page, wrapper);
+        
+        // 返回分页结果
+        return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
     }
 
     @Override
     public List<TokenEntity> selectListView(QueryWrapper<TokenEntity> wrapper) {
         return baseMapper.selectListView(wrapper);
-    }
-
-    @Override
-    public PageUtils queryPage(Map<String, Object> params, QueryWrapper<TokenEntity> wrapper) {
-        Page<TokenEntity> page = new Page<>(
-                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
-                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
-        page.setRecords(baseMapper.selectListView(page, wrapper));
-        return new PageUtils(page);
     }
 
     @Override

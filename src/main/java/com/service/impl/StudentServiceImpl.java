@@ -21,12 +21,19 @@ public class StudentServiceImpl extends ServiceImpl<StudentDao, StudentEntity> i
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        IPage<StudentEntity> page = this.page(
-                new Page<StudentEntity>(
-                        params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
-                        params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10),
-                new QueryWrapper<StudentEntity>());
-        return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+        // 创建查询条件
+        QueryWrapper<StudentEntity> queryWrapper = new QueryWrapper<>();
+        
+        // 创建分页对象
+        Page<StudentEntity> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        
+        // 使用page方法进行分页查询
+        IPage<StudentEntity> iPage = this.page(page, queryWrapper);
+        
+        // 返回分页结果
+        return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
     }
 
     @Override

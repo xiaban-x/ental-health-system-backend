@@ -51,13 +51,16 @@ public class CounselorServiceImpl extends ServiceImpl<CounselorDao, CounselorEnt
         // 默认按ID排序
         queryWrapper.orderByAsc("id");
 
-        IPage<CounselorEntity> page = this.page(
-                new Page<CounselorEntity>(
-                        params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
-                        params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10),
-                queryWrapper);
-
-        return new PageUtils(page.getRecords(), (int) page.getTotal(), (int) page.getSize(), (int) page.getCurrent());
+        // 创建分页对象
+        Page<CounselorEntity> page = new Page<>(
+                params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1,
+                params.containsKey("limit") ? Integer.parseInt(params.get("limit").toString()) : 10);
+        
+        // 使用page方法进行分页查询
+        IPage<CounselorEntity> iPage = this.page(page, queryWrapper);
+        
+        // 返回分页结果
+        return new PageUtils(iPage.getRecords(), (int) iPage.getTotal(), (int) iPage.getSize(), (int) iPage.getCurrent());
     }
 
     @Override
