@@ -18,16 +18,4 @@ import com.entity.view.ExamQuestionView;
  * @date 2021-05-04 17:24:35
  */
 public interface ExamQuestionDao extends BaseMapper<ExamQuestionEntity> {
-
-	List<ExamQuestionVO> selectListVO(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
-
-	ExamQuestionVO selectVO(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
-
-	List<ExamQuestionView> selectListView(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
-
-	List<ExamQuestionView> selectListView(Page<ExamQuestionView> page,
-			@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
-
-	ExamQuestionView selectView(@Param("ew") Wrapper<ExamQuestionEntity> wrapper);
-
 }
