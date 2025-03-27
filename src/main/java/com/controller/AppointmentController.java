@@ -10,6 +10,7 @@ import com.service.AppointmentService;
 import com.service.CounselorService;
 import com.service.TimeSlotService;
 import com.service.UserService;
+import com.utils.PageUtils;
 import com.utils.R;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,16 +124,39 @@ public class AppointmentController {
      * 获取我的预约列表
      */
     @Operation(summary = "获取我的预约列表", description = "获取当前用户的所有预约记录")
+    @Parameters({
+            @Parameter(name = "page", description = "页码", required = true),
+            @Parameter(name = "size", description = "每页数量", required = true)
+    })
     @GetMapping("/my-appointments")
-    public R myAppointments(HttpServletRequest request) {
+    public R myAppointments(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
         // 从token中获取用户信息
-        int userId = (int) request.getAttribute("userId");
+        Integer userId = (Integer) request.getAttribute("userId");
+        if (userId == null) {
+            return R.error("用户未登录");
+        }
 
         QueryWrapper<AppointmentEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
         queryWrapper.orderByDesc("created_at");
-        List<AppointmentEntity> list = appointmentService.list(queryWrapper);
-        return R.ok().put("data", list);
+
+        // 创建分页参数
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", page);
+        params.put("limit", size);
+
+        try {
+            // 使用分页查询
+            PageUtils pageResult = appointmentService.queryPage(params, queryWrapper);
+
+            return R.ok().put("data", pageResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error("查询失败：" + e.getMessage());
+        }
     }
 
     /**
