@@ -57,3 +57,10 @@ mybatis-plus:
       logic-delete-value: -1
       logic-not-delete-value: 0
     banner: false
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket:
+    name: media
+    chunks: chunks
