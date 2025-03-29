@@ -4,7 +4,9 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
@@ -12,11 +14,12 @@ import java.util.Date;
  * 分片信息实体类
  */
 @Data
+@TableName("chunk_info")
 public class ChunkInfo {
     /**
      * ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -87,18 +90,19 @@ public class ChunkInfo {
     /**
      * 分片文件（不存入数据库，仅用于传输）
      */
+    @TableField(exist = false)
     private transient MultipartFile file;
 
     // 在setter方法中添加类型转换逻辑
-        public void setChunkNumber(Object chunkNumber) {
-            if (chunkNumber instanceof String) {
-                this.chunkNumber = Integer.parseInt((String) chunkNumber);
-            } else if (chunkNumber instanceof Number) {
-                this.chunkNumber = ((Number) chunkNumber).intValue();
-            } else {
-                this.chunkNumber = null;
-            }
+    public void setChunkNumber(Object chunkNumber) {
+        if (chunkNumber instanceof String) {
+            this.chunkNumber = Integer.parseInt((String) chunkNumber);
+        } else if (chunkNumber instanceof Number) {
+            this.chunkNumber = ((Number) chunkNumber).intValue();
+        } else {
+            this.chunkNumber = null;
         }
-        
-        // 类似地，为其他数值字段添加类型转换逻辑
+    }
+
+    // 类似地，为其他数值字段添加类型转换逻辑
 }

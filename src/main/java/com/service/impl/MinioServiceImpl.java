@@ -27,6 +27,9 @@ public class MinioServiceImpl implements MinioService {
 
     @Value("${minio.bucket.name}")
     private String bucketName;
+    
+    @Value("${minio.bucket.chunks}")
+    private String chunkBucketName;
 
     /**
      * 上传文件
@@ -62,9 +65,12 @@ public class MinioServiceImpl implements MinioService {
      */
     @Override
     public void deleteFile(String objectName) throws Exception {
+        // 判断文件路径是否以chunks/开头，如果是则使用chunkBucketName
+        String bucket = objectName.startsWith("chunks/") ? chunkBucketName : bucketName;
+        
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(bucket)
                         .object(objectName)
                         .build());
     }

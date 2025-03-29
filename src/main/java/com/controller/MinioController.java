@@ -68,18 +68,6 @@ public class MinioController {
                 chunkInfo.setChunkNumber(Integer.parseInt(params.get("chunkNumber").toString()));
             }
 
-            if (params.containsKey("chunkSize")) {
-                chunkInfo.setChunkSize(Long.parseLong(params.get("chunkSize").toString()));
-            }
-
-            if (params.containsKey("currentChunkSize")) {
-                chunkInfo.setCurrentChunkSize(Long.parseLong(params.get("currentChunkSize").toString()));
-            }
-
-            if (params.containsKey("totalSize")) {
-                chunkInfo.setTotalSize(Long.parseLong(params.get("totalSize").toString()));
-            }
-
             if (params.containsKey("identifier")) {
                 chunkInfo.setIdentifier(params.get("identifier").toString());
             }
@@ -92,6 +80,19 @@ public class MinioController {
                 chunkInfo.setTotalChunks(Integer.parseInt(params.get("totalChunks").toString()));
             }
 
+            // 其他可选参数
+            if (params.containsKey("chunkSize")) {
+                chunkInfo.setChunkSize(Long.parseLong(params.get("chunkSize").toString()));
+            }
+
+            if (params.containsKey("currentChunkSize")) {
+                chunkInfo.setCurrentChunkSize(Long.parseLong(params.get("currentChunkSize").toString()));
+            }
+
+            if (params.containsKey("totalSize")) {
+                chunkInfo.setTotalSize(Long.parseLong(params.get("totalSize").toString()));
+            }
+
             if (params.containsKey("fileType")) {
                 chunkInfo.setFileType(params.get("fileType").toString());
             }
@@ -101,6 +102,7 @@ public class MinioController {
                 return R.error("分片标识符或分片编号不能为空");
             }
 
+            // 从数据库中查询分片是否存在
             Map<String, Object> result = chunkService.checkChunkExists(chunkInfo);
             return R.ok().put("data", result);
         } catch (Exception e) {
@@ -137,6 +139,7 @@ public class MinioController {
             chunkInfo.setFileType(fileType);
             chunkInfo.setFile(file);
 
+            // 上传分片并保存记录到数据库
             chunkService.uploadChunk(chunkInfo);
             return R.ok();
         } catch (Exception e) {
@@ -152,8 +155,10 @@ public class MinioController {
     @PostMapping("/chunk/merge")
     public R mergeChunks(@RequestBody ChunkInfo chunkInfo) {
         try {
+            // 合并分片，此操作会删除Minio中的临时分片，但保留数据库记录
             String objectName = chunkService.mergeChunks(chunkInfo);
             String url = minioService.getFileUrl(objectName);
+            
             // 将返回数据统一放在data字段下
             Map<String, Object> data = Map.of(
                     "url", url,
