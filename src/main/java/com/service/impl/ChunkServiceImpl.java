@@ -40,8 +40,15 @@ public class ChunkServiceImpl implements ChunkService {
     @Override
     public Map<String, Object> checkChunkExists(ChunkInfo chunkInfo) {
         Map<String, Object> result = new HashMap<>();
+        
+        // 确保identifier和chunkNumber不为空
         String identifier = chunkInfo.getIdentifier();
         Integer chunkNumber = chunkInfo.getChunkNumber();
+        
+        if (identifier == null || chunkNumber == null) {
+            result.put("exists", false);
+            return result;
+        }
         
         // 获取该文件的上传状态
         Map<Integer, Boolean> uploadStatus = CHUNK_UPLOAD_STATUS.getOrDefault(identifier, new HashMap<>());
