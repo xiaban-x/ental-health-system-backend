@@ -33,11 +33,6 @@ public class ChunkInfo {
     private Long chunkSize;
 
     /**
-     * 当前分片大小
-     */
-    private Long currentChunkSize;
-
-    /**
      * 总大小
      */
     private Long totalSize;

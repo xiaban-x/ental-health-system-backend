@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -85,10 +86,6 @@ public class MinioController {
                 chunkInfo.setChunkSize(Long.parseLong(params.get("chunkSize").toString()));
             }
 
-            if (params.containsKey("currentChunkSize")) {
-                chunkInfo.setCurrentChunkSize(Long.parseLong(params.get("currentChunkSize").toString()));
-            }
-
             if (params.containsKey("totalSize")) {
                 chunkInfo.setTotalSize(Long.parseLong(params.get("totalSize").toString()));
             }
@@ -120,25 +117,24 @@ public class MinioController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("chunkNumber") Integer chunkNumber,
             @RequestParam("chunkSize") Long chunkSize,
-            @RequestParam("currentChunkSize") Long currentChunkSize,
             @RequestParam("totalSize") Long totalSize,
             @RequestParam("identifier") String identifier,
             @RequestParam("filename") String filename,
             @RequestParam("totalChunks") Integer totalChunks,
-            @RequestParam(value = "fileType", required = false) String fileType) {
+            @RequestParam(value = "fileType", required = false) String fileType,
+            @RequestParam(value = "relativePath", required = false) String relativePath) {
         try {
             // 构建ChunkInfo对象
             ChunkInfo chunkInfo = new ChunkInfo();
             chunkInfo.setChunkNumber(chunkNumber);
             chunkInfo.setChunkSize(chunkSize);
-            chunkInfo.setCurrentChunkSize(currentChunkSize);
             chunkInfo.setTotalSize(totalSize);
             chunkInfo.setIdentifier(identifier);
             chunkInfo.setFilename(filename);
             chunkInfo.setTotalChunks(totalChunks);
             chunkInfo.setFileType(fileType);
             chunkInfo.setFile(file);
-
+            chunkInfo.setRelativePath(relativePath);
             // 上传分片并保存记录到数据库
             chunkService.uploadChunk(chunkInfo);
             return R.ok();
@@ -155,14 +151,23 @@ public class MinioController {
     @PostMapping("/chunk/merge")
     public R mergeChunks(@RequestBody ChunkInfo chunkInfo) {
         try {
+            // 打印请求参数，便于调试
+            System.out.println("合并分片请求参数: " + chunkInfo);
+
             // 合并分片，此操作会删除Minio中的临时分片，但保留数据库记录
             String objectName = chunkService.mergeChunks(chunkInfo);
+
+            // 打印合并后的对象名，便于调试
+            System.out.println("合并后的对象名: " + objectName);
+
             String url = minioService.getFileUrl(objectName);
-            
+            System.out.println("文件访问URL: " + url);
+
             // 将返回数据统一放在data字段下
-            Map<String, Object> data = Map.of(
-                    "url", url,
-                    "fileName", objectName);
+            Map<String, Object> data = new HashMap<>();
+            data.put("url", url);
+            data.put("fileName", objectName);
+
             return R.ok().put("data", data);
         } catch (Exception e) {
             e.printStackTrace();
