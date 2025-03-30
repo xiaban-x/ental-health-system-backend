@@ -22,7 +22,7 @@ public class AppointmentEntity implements Serializable {
      * 主键id
      */
     @TableId(type = IdType.ASSIGN_ID)
-    private int id;
+    private Integer id;
 
     /**
      * 用户id
