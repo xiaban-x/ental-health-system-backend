@@ -50,8 +50,8 @@ public class ChunkServiceImpl implements ChunkService {
 
         // 确保必要参数不为空
         Integer chunkNumber = chunkInfo.getChunkNumber();
-        Long chunkSize = chunkInfo.getChunkSize();
-        Long totalSize = chunkInfo.getTotalSize();
+        Integer chunkSize = chunkInfo.getChunkSize();
+        Integer totalSize = chunkInfo.getTotalSize();
         String filename = chunkInfo.getFilename();
 
         if (chunkNumber == null || chunkSize == null || totalSize == null || filename == null) {
@@ -216,15 +216,15 @@ public class ChunkServiceImpl implements ChunkService {
         for (ChunkInfo chunk : chunkList) {
             // 获取分片在Minio中的路径
             String chunkPath = chunk.getChunkPath();
-            
+
             // 确保分片路径存在
             if (chunkPath == null || chunkPath.isEmpty()) {
                 throw new Exception("分片路径为空: " + chunk.getChunkNumber());
             }
-            
+
             sources.add(
                     ComposeSource.builder()
-                            .bucket(chunkBucketName)  // 分片存储在chunks桶中
+                            .bucket(chunkBucketName) // 分片存储在chunks桶中
                             .object(chunkPath)
                             .build());
         }
@@ -247,11 +247,11 @@ public class ChunkServiceImpl implements ChunkService {
             // 合并分片到media桶
             minioClient.composeObject(
                     ComposeObjectArgs.builder()
-                            .bucket(bucketName)  // 最终文件存储在media桶中
+                            .bucket(bucketName) // 最终文件存储在media桶中
                             .object(finalObjectName)
                             .sources(sources)
                             .build());
-            
+
             System.out.println("合并分片 - 合并成功: " + finalObjectName);
         } catch (Exception e) {
             System.err.println("合并分片失败: " + e.getMessage());

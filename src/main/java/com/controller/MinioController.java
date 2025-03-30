@@ -83,11 +83,13 @@ public class MinioController {
 
             // 其他可选参数
             if (params.containsKey("chunkSize")) {
-                chunkInfo.setChunkSize(Long.parseLong(params.get("chunkSize").toString()));
+                // 使用Integer.parseInt进行正确的字符串到整数的转换
+                chunkInfo.setChunkSize(Integer.parseInt(params.get("chunkSize").toString()));
             }
 
             if (params.containsKey("totalSize")) {
-                chunkInfo.setTotalSize(Long.parseLong(params.get("totalSize").toString()));
+                // 同样修复totalSize的转换
+                chunkInfo.setTotalSize(Integer.parseInt(params.get("totalSize").toString()));
             }
 
             if (params.containsKey("fileType")) {
@@ -116,8 +118,8 @@ public class MinioController {
     public R uploadChunk(
             @RequestParam("file") MultipartFile file,
             @RequestParam("chunkNumber") Integer chunkNumber,
-            @RequestParam("chunkSize") Long chunkSize,
-            @RequestParam("totalSize") Long totalSize,
+            @RequestParam("chunkSize") Integer chunkSize,
+            @RequestParam("totalSize") Integer totalSize,
             @RequestParam("identifier") String identifier,
             @RequestParam("filename") String filename,
             @RequestParam("totalChunks") Integer totalChunks,

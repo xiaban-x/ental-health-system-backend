@@ -30,12 +30,12 @@ public class ChunkInfo {
     /**
      * 分片大小
      */
-    private Long chunkSize;
+    private Integer chunkSize;
 
     /**
      * 总大小
      */
-    private Long totalSize;
+    private Integer totalSize;
 
     /**
      * 文件标识
