@@ -96,10 +96,16 @@ public class ChunkServiceImpl implements ChunkService {
         chunkInfo.setCreatedAt(new Date());
         chunkInfo.setUpdatedAt(new Date());
 
-        // 检查数据库中是否已存在该分片记录
+        // 检查数据库中是否已存在该分片记录，使用多个字段组合判断
         QueryWrapper<ChunkInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("identifier", identifier)
-                .eq("chunk_number", chunkNumber);
+        queryWrapper.eq("chunk_number", chunkNumber)
+                .eq("chunk_size", chunkInfo.getChunkSize())
+                .eq("total_size", chunkInfo.getTotalSize())
+                .eq("filename", chunkInfo.getFilename());
+
+        if (chunkInfo.getFileType() != null) {
+            queryWrapper.eq("file_type", chunkInfo.getFileType());
+        }
 
         ChunkInfo existingChunk = chunkInfoDao.selectOne(queryWrapper);
 
@@ -107,9 +113,17 @@ public class ChunkServiceImpl implements ChunkService {
             // 保存分片信息到数据库
             chunkInfoDao.insert(chunkInfo);
         } else {
-            // 更新已存在的分片记录
-            chunkInfo.setId(existingChunk.getId());
-            chunkInfoDao.updateById(chunkInfo);
+            // 判断已存在记录的更新时间是否超过7天
+            Date now = new Date();
+            long diffInMillies = Math.abs(now.getTime() - existingChunk.getUpdatedAt().getTime());
+            long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
+
+            if (diffInDays > 7) {
+                // 如果超过7天，更新记录的时间戳
+                existingChunk.setUpdatedAt(now);
+                chunkInfoDao.updateById(existingChunk);
+            }
+            // 如果没超过7天，不做任何操作，因为分片已存在且是最近上传的
         }
     }
 
