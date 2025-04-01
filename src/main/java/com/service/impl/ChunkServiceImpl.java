@@ -53,6 +53,7 @@ public class ChunkServiceImpl implements ChunkService {
         Integer chunkSize = chunkInfo.getChunkSize();
         Integer totalSize = chunkInfo.getTotalSize();
         String filename = chunkInfo.getFilename();
+        String relativePath = chunkInfo.getRelativePath();
 
         if (chunkNumber == null || chunkSize == null || totalSize == null || filename == null) {
             result.put("exists", false);
@@ -66,16 +67,30 @@ public class ChunkServiceImpl implements ChunkService {
                 .eq("total_size", totalSize)
                 .eq("filename", filename);
 
-        // 添加文件类型和相对路径的检查
+        // 添加文件类型的检查
         if (chunkInfo.getFileType() != null) {
             queryWrapper.eq("file_type", chunkInfo.getFileType());
         }
 
-        if (chunkInfo.getRelativePath() != null) {
-            queryWrapper.eq("relative_path", chunkInfo.getRelativePath());
+        // 处理相对路径，考虑当前月份和上个月份
+        if (relativePath != null && !relativePath.isEmpty()) {
+            // 获取当前月份和上个月份的路径
+            String[] paths = getMonthPaths(relativePath);
+            String currentMonthPath = paths[0];
+            String lastMonthPath = paths[1];
+
+            // 构建OR条件：当前月份路径 OR 上个月份路径
+            queryWrapper.and(wrapper -> wrapper
+                    .eq("relative_path", currentMonthPath)
+                    .or()
+                    .eq("relative_path", lastMonthPath));
+
+            System.out.println("检查分片 - 当前月份路径: " + currentMonthPath + ", 上个月份路径: " + lastMonthPath);
         }
 
+        System.out.println("chunkInfo ===> " + chunkInfo);
         ChunkInfo existingChunk = chunkInfoDao.selectOne(queryWrapper);
+        System.out.println("existingChunk ===> " + existingChunk);
 
         // 检查分片是否存在且未过期（7天内）
         boolean exists = false;
@@ -181,9 +196,20 @@ public class ChunkServiceImpl implements ChunkService {
                 .orderByDesc("updated_at")
                 .last("LIMIT 1");
 
-        // 如果有相对路径，也加入查询条件
+        // 处理相对路径，考虑当前月份和上个月份
         if (relativePath != null && !relativePath.isEmpty()) {
-            existingFileQuery.eq("relative_path", relativePath);
+            // 获取当前月份和上个月份的路径
+            String[] paths = getMonthPaths(relativePath);
+            String currentMonthPath = paths[0];
+            String lastMonthPath = paths[1];
+
+            // 构建OR条件：当前月份路径 OR 上个月份路径
+            existingFileQuery.and(wrapper -> wrapper
+                    .eq("relative_path", currentMonthPath)
+                    .or()
+                    .eq("relative_path", lastMonthPath));
+
+            System.out.println("合并分片 - 检查已存在文件 - 当前月份路径: " + currentMonthPath + ", 上个月份路径: " + lastMonthPath);
         }
 
         ChunkInfo existingFile = chunkInfoDao.selectOne(existingFileQuery);
@@ -194,17 +220,69 @@ public class ChunkServiceImpl implements ChunkService {
             return existingFile.getChunkPath();
         }
 
-        // 从数据库中查询所有分片记录
-        QueryWrapper<ChunkInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("identifier", identifier)
-                .orderByAsc("chunk_number");
+        // 从数据库中查询所有分片记录，先查当前月份
+        List<ChunkInfo> chunkList = new ArrayList<>();
 
-        // 如果有相对路径，也加入查询条件
         if (relativePath != null && !relativePath.isEmpty()) {
-            queryWrapper.eq("relative_path", relativePath);
-        }
+            // 获取当前月份和上个月份的路径
+            String[] paths = getMonthPaths(relativePath);
+            String currentMonthPath = paths[0];
+            String lastMonthPath = paths[1];
 
-        List<ChunkInfo> chunkList = chunkInfoDao.selectList(queryWrapper);
+            // 先查询当前月份的分片
+            QueryWrapper<ChunkInfo> currentMonthQuery = new QueryWrapper<>();
+            currentMonthQuery.eq("identifier", identifier)
+                    .eq("relative_path", currentMonthPath)
+                    .orderByAsc("chunk_number");
+
+            List<ChunkInfo> currentMonthChunks = chunkInfoDao.selectList(currentMonthQuery);
+            System.out.println("当前月份分片数量: " + currentMonthChunks.size());
+
+            // 如果当前月份的分片数量等于总分片数，直接使用当前月份的分片
+            if (currentMonthChunks.size() == totalChunks) {
+                chunkList = currentMonthChunks;
+            } else {
+                // 查询上个月份的分片
+                QueryWrapper<ChunkInfo> lastMonthQuery = new QueryWrapper<>();
+                lastMonthQuery.eq("identifier", identifier)
+                        .eq("relative_path", lastMonthPath)
+                        .orderByAsc("chunk_number");
+
+                List<ChunkInfo> lastMonthChunks = chunkInfoDao.selectList(lastMonthQuery);
+                System.out.println("上个月份分片数量: " + lastMonthChunks.size());
+
+                // 如果上个月份的分片数量等于总分片数，使用上个月份的分片
+                if (lastMonthChunks.size() == totalChunks) {
+                    chunkList = lastMonthChunks;
+                } else {
+                    // 合并两个月份的分片，按照分片号排序
+                    Map<Integer, ChunkInfo> chunkMap = new HashMap<>();
+
+                    // 优先使用当前月份的分片
+                    for (ChunkInfo chunk : currentMonthChunks) {
+                        chunkMap.put(chunk.getChunkNumber(), chunk);
+                    }
+
+                    // 如果当前月份没有某个分片，则使用上个月份的
+                    for (ChunkInfo chunk : lastMonthChunks) {
+                        if (!chunkMap.containsKey(chunk.getChunkNumber())) {
+                            chunkMap.put(chunk.getChunkNumber(), chunk);
+                        }
+                    }
+
+                    // 将Map转换为List并按分片号排序
+                    chunkList = new ArrayList<>(chunkMap.values());
+                    chunkList.sort((a, b) -> a.getChunkNumber().compareTo(b.getChunkNumber()));
+                }
+            }
+        } else {
+            // 如果没有相对路径，直接查询所有分片
+            QueryWrapper<ChunkInfo> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("identifier", identifier)
+                    .orderByAsc("chunk_number");
+
+            chunkList = chunkInfoDao.selectList(queryWrapper);
+        }
 
         // 检查所有分片是否都已上传
         if (chunkList.size() != totalChunks) {
@@ -232,7 +310,7 @@ public class ChunkServiceImpl implements ChunkService {
         // 生成最终文件名，包含时间戳确保唯一性
         String finalObjectName = System.currentTimeMillis() + finalObjectNamePattern;
 
-        // 如果有相对路径，添加到文件名前
+        // 如果有相对路径，添加到文件名前，使用当前月份的路径
         if (relativePath != null && !relativePath.isEmpty() && !relativePath.equals("/")) {
             // 确保相对路径格式正确（去掉开头的斜杠，确保结尾有斜杠）
             String formattedPath = relativePath.startsWith("/") ? relativePath.substring(1) : relativePath;
@@ -288,5 +366,57 @@ public class ChunkServiceImpl implements ChunkService {
      */
     private String getChunkObjectName(String identifier, Integer chunkNumber) {
         return "chunks/" + identifier + "/" + chunkNumber;
+    }
+
+    /**
+     * 获取当前月份和上个月份的路径
+     * 例如：输入 "2025/04/video"，返回 ["2025/04/video", "2025/03/video"]
+     */
+    private String[] getMonthPaths(String relativePath) {
+        String[] result = new String[2];
+        result[0] = relativePath; // 当前月份路径
+
+        if (relativePath != null && !relativePath.isEmpty()) {
+            // 假设路径格式为 "yyyy/MM/xxx"
+            String[] parts = relativePath.split("/");
+            if (parts.length >= 2) {
+                try {
+                    int year = Integer.parseInt(parts[0]);
+                    int month = Integer.parseInt(parts[1]);
+
+                    // 计算上个月的年份和月份
+                    if (month == 1) {
+                        year--;
+                        month = 12;
+                    } else {
+                        month--;
+                    }
+
+                    // 构建上个月的路径
+                    StringBuilder lastMonthPath = new StringBuilder();
+                    lastMonthPath.append(year).append("/");
+                    // 确保月份是两位数
+                    if (month < 10) {
+                        lastMonthPath.append("0");
+                    }
+                    lastMonthPath.append(month);
+
+                    // 添加剩余的路径部分
+                    for (int i = 2; i < parts.length; i++) {
+                        lastMonthPath.append("/").append(parts[i]);
+                    }
+
+                    result[1] = lastMonthPath.toString();
+                    return result;
+                } catch (NumberFormatException e) {
+                    // 如果解析年份或月份失败，返回原路径
+                    result[1] = relativePath;
+                }
+            }
+        }
+
+        // 如果无法处理，上个月份路径与当前月份路径相同
+        result[1] = relativePath;
+        return result;
     }
 }
