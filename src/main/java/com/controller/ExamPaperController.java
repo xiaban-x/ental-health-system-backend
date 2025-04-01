@@ -156,10 +156,16 @@ public class ExamPaperController {
     @Operation(summary = "创建试卷", description = "创建新的试卷")
     @Parameter(name = "examPaper", description = "试卷信息", required = true)
     @PostMapping
-    public R createExamPaper(@RequestBody ExamPaperEntity examPaper) {
+    public R createExamPaper(@RequestBody ExamPaperEntity examPaper, HttpServletRequest request) {
+        // 从请求中获取用户ID
+        Integer userId = (Integer) request.getAttribute("userId");
+        if (userId == null) {
+            return R.error("用户未登录");
+        }
         if (examPaper == null || StringUtils.isBlank(examPaper.getTitle())) {
             return R.error("试卷名称不能为空");
         }
+        examPaper.setUserId(userId);
         boolean saved = examPaperService.save(examPaper);
         return saved ? R.ok().put("data", examPaper) : R.error("创建失败");
     }
@@ -241,7 +247,7 @@ public class ExamPaperController {
 
         // 计算总分
         int totalScore = 0;
-        
+
         // 遍历答案计算得分
         for (AnswerSubmitDTO.Answer answer : submitDTO.getAnswers()) {
             // 获取题目信息
@@ -249,23 +255,23 @@ public class ExamPaperController {
             if (question == null) {
                 continue;
             }
-            
+
             // 判断答案是否正确并计算得分
             if (answer.getOptionValue().equals(question.getAnswer())) {
                 totalScore += question.getScore();
             }
         }
-        
+
         // 创建考试记录
         ExamRecordEntity record = new ExamRecordEntity();
         record.setUserId(tokenEntity.getUserId());
         record.setPaperId(paperId);
         record.setTotalScore(totalScore);
-        
+
         // 根据得分生成反馈
         String feedback = generateFeedback(totalScore, paper);
         record.setFeedback(feedback);
-        
+
         // 保存记录
         boolean success = examRecordService.save(record);
 
@@ -275,17 +281,18 @@ public class ExamPaperController {
 
         return R.ok().put("data", record);
     }
-    
+
     /**
      * 根据得分生成反馈
+     * 
      * @param totalScore 总分
-     * @param paper 试卷信息
+     * @param paper      试卷信息
      * @return 反馈内容
      */
     private String generateFeedback(int totalScore, ExamPaperEntity paper) {
         // 这里可以根据试卷类型和得分情况生成不同的反馈
         // 例如心理测试可能有不同的结果解释
-        
+
         // 简单示例
         if (totalScore >= 80) {
             return "优秀：您的表现非常出色！";
