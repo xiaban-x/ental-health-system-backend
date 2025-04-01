@@ -96,6 +96,9 @@ public class MinioController {
                 chunkInfo.setFileType(params.get("fileType").toString());
             }
 
+            if (params.containsKey("relativePath")) {
+                chunkInfo.setRelativePath(params.get("relativePath").toString());
+            }
             // 确保必要参数不为空
             if (chunkInfo.getIdentifier() == null || chunkInfo.getChunkNumber() == null) {
                 return R.error("分片标识符或分片编号不能为空");
