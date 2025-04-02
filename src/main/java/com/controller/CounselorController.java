@@ -226,11 +226,18 @@ public class CounselorController {
     }
 
     /**
-     * 获取当前登录咨询师的所有时间段
+     * 获取当前登录咨询师的所有时间段（分页）
      */
-    @Operation(summary = "获取我的时间段", description = "获取当前登录咨询师的所有时间段")
+    @Operation(summary = "获取我的时间段", description = "获取当前登录咨询师的所有时间段（分页）")
+    @Parameters({
+            @Parameter(name = "page", description = "页码", required = true),
+            @Parameter(name = "size", description = "每页数量", required = true)
+    })
     @GetMapping("/my-time-slots")
-    public R myTimeSlots(@RequestHeader("Authorization") String authorization) {
+    public R myTimeSlots(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestHeader("Authorization") String authorization) {
         // 从Authorization头获取token
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             return R.error("无效的认证头");
@@ -255,13 +262,19 @@ public class CounselorController {
             return R.error("您不是咨询师");
         }
 
-        // 查询该咨询师的所有时间段
+        // 构建查询条件
         QueryWrapper<TimeSlotEntity> timeSlotQuery = new QueryWrapper<>();
         timeSlotQuery.eq("counselor_id", counselor.getId());
         timeSlotQuery.orderByAsc("start_time");
-        List<TimeSlotEntity> timeSlots = timeSlotService.list(timeSlotQuery);
 
-        return R.ok().put("data", timeSlots);
+        // 构建查询参数
+        Map<String, Object> params = Map.of(
+                "page", page,
+                "size", size,
+                "counselorId", counselor.getId());
+
+        // 使用分页查询
+        return R.ok().put("data", timeSlotService.queryPage(params, timeSlotQuery));
     }
 
     /**
